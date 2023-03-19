@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
     }
 
     #ifdef DEBUG
-    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
+    cerr << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
-        cout << setw(4) << v[i];
+        cerr << setw(4) << v[i];
     }
-    cout << endl << endl;
+    cerr << endl << endl;
     #endif
 
     /***********************************************************************/
@@ -63,13 +63,13 @@ int main(int argc, char** argv) {
     duration = std::chrono::duration_cast<std::chrono::microseconds>(tf - t0).count();
 
     #ifdef DEBUG
-    cout << "-----------------------------------------------------------\n\n";
+    cerr << "-----------------------------------------------------------\n\n";
 
-    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
+    cerr << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
         cout << setw(4) << v[i];
     }
-    cout << endl << endl;
+    cerr << endl << endl;
     #endif
 
     cout << N << "\t" << duration << endl;

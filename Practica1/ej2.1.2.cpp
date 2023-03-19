@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
     }
 
     #ifdef DEBUG
-    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
+    cerr << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
-        cout << setw(4) << v1[i];
+        cerr << setw(4) << v1[i];
     }
-    cout << endl << endl;
+    cerr << endl << endl;
     #endif
 
     /***********************************************************************/
@@ -63,13 +63,13 @@ int main(int argc, char** argv) {
     duration = std::chrono::duration_cast<std::chrono::microseconds>(tf - t0).count();
 
     #ifdef DEBUG
-    cout << "-----------------------------------------------------------\n\n";
+    cerr << "-----------------------------------------------------------\n\n";
 
-    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
+    cerr << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
-        cout << setw(4) << v1[i];
+        cerr << setw(4) << v1[i];
     }
-    cout << endl << endl;
+    cerr << endl << endl;
     #endif
 
     cout << N << "\t" << duration << endl;
@@ -83,22 +83,17 @@ int* EliminaRepetidos(int* v, int& N) {
     int i = 0;
     while (i < N) {
 
-        int j = i+1;
-        while (j < N) {
-
-            if (v[i] == v[j]) {
-
-                for (int k=j; k<N-1; k++) {
-                    v[k] = v[k+1];
-                }
-
-                N--;
+        if (v[i] == v[i+1]) {
+                
+            for (int j=i; j<N-1; j++) {
+                v[j] = v[j+1];
             }
-            else {
-                j++;
-            }
+
+            N--;
         }
-        i++;
+        else {
+            i++;
+        }
     }
 
     return v;
