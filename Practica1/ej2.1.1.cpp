@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void EliminaRepetidos(int* v1, int& N1, int* v2, int& N2);
+void EliminaRepetidos(int* v, int& N);
 
 // #define DEBUG
 
@@ -13,10 +13,10 @@ int main(int argc, char** argv) {
     /***********************************************************************/
     // Comprobación de argumentos
 
-    if (argc != 4) {
+    if (argc != 3) {
         
         cerr << "Número de argumentos incorrecto." << endl;
-        cerr << "Uso: " << argv[0] << " <N1> <N2> <semilla>" << endl;
+        cerr << "Uso: " << argv[0] << " <N> <semilla>" << endl;
         exit(-1);
     }
 
@@ -27,40 +27,27 @@ int main(int argc, char** argv) {
     chrono::time_point<std::chrono::high_resolution_clock> t0, tf;
 
     // Vectores y semilla
-    const int N1 = stoi(argv[1]);
-    const int N2 = stoi(argv[2]);
-    srand(stoul(argv[3]));
+    const int N = stoi(argv[1]);
+    srand(stoul(argv[2]));
 
-    int v1[N1];
-    int total_utilizados1 = N1;
-    int v2[N2];
-    int total_utilizados2 = N2;
+    int v[N];
+    int total_utilizados1 = N;
 
     // Rango de valores a introducir en el vector
     const int MIN = 0;
-    const int MAX = 5;
+    const int MAX = N;
 
     /***********************************************************************/
     // Rellenamos los vectores con valores aleatorios (entre 0 y 100 )
 
     for (int i=0; i<total_utilizados1; i++) {
-        v1[i] = (rand() % (MAX-MIN)) + MIN;
-    }
-
-    for (int i=0; i<total_utilizados2; i++) {
-        v2[i] = (rand() % (MAX-MIN)) + MIN;
+        v[i] = (rand() % (MAX-MIN)) + MIN;
     }
 
     #ifdef DEBUG
-    cout << "v1 (tamaño " << total_utilizados1 << "):" << endl;
+    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
-        cout << setw(4) << v1[i];
-    }
-    cout << endl << endl;
-
-    cout << "v2 (tamaño " << total_utilizados2 << "):" << endl;
-    for (int i=0; i<total_utilizados2; i++) {
-        cout << setw(4) << v2[i];
+        cout << setw(4) << v[i];
     }
     cout << endl << endl;
     #endif
@@ -69,7 +56,7 @@ int main(int argc, char** argv) {
     // Medición del tiempo (en nanosegundos)
 
     t0 = std::chrono::high_resolution_clock::now();
-    EliminaRepetidos(v1, total_utilizados1, v2, total_utilizados2);
+    EliminaRepetidos(v, total_utilizados1);
     tf = std::chrono::high_resolution_clock::now();
 
     unsigned long duration;
@@ -78,43 +65,42 @@ int main(int argc, char** argv) {
     #ifdef DEBUG
     cout << "-----------------------------------------------------------\n\n";
 
-    cout << "v1 (tamaño " << total_utilizados1 << "):" << endl;
+    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
-        cout << setw(4) << v1[i];
+        cout << setw(4) << v[i];
     }
     cout << endl << endl;
     #endif
 
-    cout << N1 << "\t" << duration << endl;
+    cout << N << "\t" << duration << endl;
 
 
     return 0;
 
 }
 
-void EliminaRepetidos(int* v1, int& N1, int* v2, int& N2) {
+void EliminaRepetidos(int* v, int& N) {
 
-    // Recorremos v1 buscando los elementos que coincidenc con v2
     int i = 0;
-    bool eliminado;
-    while (i < N1) {
 
-        eliminado = false;
+    while (i < N) {
 
-        for (int j=0; j<N2; j++) {
+        int j = 0;
 
-            if (v1[i] == v2[j]) {
+        while (j < N) {
 
-                for (int k=i; k<N1-1; k++) {
-                    v1[k] = v1[k+1];
+            if (v[i] == v[j]){
+                for (int k = i; k < N-1; k++){
+                    v[k] = v[k+1];
+                    j = 0;
+                    N--;
                 }
-
-                N1--;
-                eliminado = true;
+            }else{
+                i++;
             }
+
         }
 
-        if (!eliminado)
-            i++;
     }
+
 }
