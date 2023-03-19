@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
     echo "Uso: ${0} <ejercicio>"
     echo
     echo "Ejercicios disponibles:"
-    for file in `find .. -iname "ej*.cpp"`; do
+    for file in `find .. -iname "*.cpp"`; do
         echo `cut -c 4-$((${#file}-4)) <<< $file`
     done
     exit -1

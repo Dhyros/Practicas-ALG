@@ -93,6 +93,3 @@ void OrdenaBurbuja(int *v, int n) {
 	 i++;
 	}
 }
-
-
-

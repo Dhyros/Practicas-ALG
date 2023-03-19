@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int* EliminaRepetidos(int* v1, int& N);
+void EliminaRepetidos(int* v1, int& N);
 
 // #define DEBUG
 
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     cerr << endl << endl;
     #endif
 
-    cout << N << "\t" << duration << endl;
+    cout << /*N << "\t" <<*/ duration << endl;
 
     return 0;
 
