@@ -4,50 +4,7 @@
 
 using namespace std;
 
-// Diseñe un algoritmo lo más eficiente posible para eliminar los elementos 
-// repetidos del vector ordenado respecto al segundo vector y devuelva, como salida, el mismo vector modificado 
-// con elementos sin repetir.
-
-int* EliminaRepetidos(int* v1, int& N1, int* v2, int& N2) {
-
-    int* v3 = new int[N1];
-    int total_utilizados3 = 0;
-
-    int i = 0;
-    int j = 0;
-
-    while (i < N1 && j < N2) {
-
-        if (v1[i] < v2[j]) {
-            v3[total_utilizados3] = v1[i];
-            total_utilizados3++;
-            i++;
-        }
-        else if (v1[i] > v2[j]) {
-            j++;
-        }
-        else {
-            i++;
-            j++;
-        }
-    }
-
-    while (i < N1) {
-        v3[total_utilizados3] = v1[i];
-        total_utilizados3++;
-        i++;
-    }
-
-    N1 = total_utilizados3;
-
-    for (int i=0; i<N1; i++) {
-        v1[i] = v3[i];
-    }
-
-    delete[] v3;
-
-    return v1;
-}
+int* EliminaRepetidos(int* v1, int& N);
 
 // #define DEBUG
 
@@ -56,10 +13,10 @@ int main(int argc, char** argv) {
     /***********************************************************************/
     // Comprobación de argumentos
 
-    if (argc != 4) {
+    if (argc != 3) {
         
         cerr << "Número de argumentos incorrecto." << endl;
-        cerr << "Uso: " << argv[0] << " <N1> <N2> <semilla>" << endl;
+        cerr << "Uso: " << argv[0] << " <N> <semilla>" << endl;
         exit(-1);
     }
 
@@ -70,18 +27,15 @@ int main(int argc, char** argv) {
     chrono::time_point<std::chrono::high_resolution_clock> t0, tf;
 
     // Vectores y semilla
-    const int N1 = stoi(argv[1]);
-    const int N2 = stoi(argv[2]);
-    srand(stoul(argv[3]));
+    const int N = stoi(argv[1]);
+    srand(stoul(argv[2]));
 
-    int v1[N1];
-    int total_utilizados1 = N1;
-    int v2[N2];
-    int total_utilizados2 = N2;
+    int v1[N];
+    int total_utilizados1 = N;
 
     // Rango de valores a introducir en el vector
     const int MIN = 0;
-    const int MAX = 5;
+    const int MAX = N;
 
     /***********************************************************************/
     // Rellenamos los vectores con valores aleatorios (entre 0 y 100 )
@@ -90,20 +44,10 @@ int main(int argc, char** argv) {
         v1[i] = (rand() % (MAX-MIN)) + MIN;
     }
 
-    for (int i=0; i<total_utilizados2; i++) {
-        v2[i] = (rand() % (MAX-MIN)) + MIN;
-    }
-
     #ifdef DEBUG
-    cout << "v1 (tamaño " << total_utilizados1 << "):" << endl;
+    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
         cout << setw(4) << v1[i];
-    }
-    cout << endl << endl;
-
-    cout << "v2 (tamaño " << total_utilizados2 << "):" << endl;
-    for (int i=0; i<total_utilizados2; i++) {
-        cout << setw(4) << v2[i];
     }
     cout << endl << endl;
     #endif
@@ -112,7 +56,7 @@ int main(int argc, char** argv) {
     // Medición del tiempo (en nanosegundos)
 
     t0 = std::chrono::high_resolution_clock::now();
-    EliminaRepetidos(v1, total_utilizados1, v2, total_utilizados2);
+    EliminaRepetidos(v1, total_utilizados1);
     tf = std::chrono::high_resolution_clock::now();
 
     unsigned long duration;
@@ -121,16 +65,41 @@ int main(int argc, char** argv) {
     #ifdef DEBUG
     cout << "-----------------------------------------------------------\n\n";
 
-    cout << "v1 (tamaño " << total_utilizados1 << "):" << endl;
+    cout << "v (tamaño " << total_utilizados1 << "):" << endl;
     for (int i=0; i<total_utilizados1; i++) {
         cout << setw(4) << v1[i];
     }
     cout << endl << endl;
     #endif
 
-    cout << N1 << "\t" << duration << endl;
-
+    cout << N << "\t" << duration << endl;
 
     return 0;
 
+}
+
+int* EliminaRepetidos(int* v, int& N) {
+    
+    int i = 0;
+    while (i < N) {
+
+        int j = i+1;
+        while (j < N) {
+
+            if (v[i] == v[j]) {
+
+                for (int k=j; k<N-1; k++) {
+                    v[k] = v[k+1];
+                }
+
+                N--;
+            }
+            else {
+                j++;
+            }
+        }
+        i++;
+    }
+
+    return v;
 }

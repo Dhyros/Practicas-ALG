@@ -28,12 +28,8 @@ chmod 777 "${ej}_exe"
 
 ej="${ej}_exe"
 for ((i=1000; i<30000; i+=1000)); do
-    # for ((j=1000; j<10000; j+=1000)); do
-    #     $ej $i $j $RANDOM >> $file
-    #     echo "N1 = ${i}, N2 = ${j}"
-    # done
     echo "N1 = ${i}"
-    $ej $i 1000 $RANDOM >> $file
+    $ej $i $RANDOM >> $file
 done
 
 #############################################################################
