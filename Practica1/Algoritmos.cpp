@@ -1,3 +1,19 @@
+/***************************************************************************/
+// ALGORITMICA
+// 
+// AUTORES:
+//  - Javier Montaño Rubio
+//  - Hossam El Amraoui Leghzali
+//  - Raul Granados Lopez
+//
+// Fichero utilizado para obtener los datos de los tiempos de ejecucion para
+// HeapSort y MergeSort.
+//
+// Fichero: ej2.1.2.cpp
+//
+// Fecha: 19/03/2023
+/***************************************************************************/
+
 #include <iostream>
 #include <iomanip>
 #include <chrono>
@@ -5,7 +21,6 @@
 
 using namespace std;
 
-void EliminaRepetidos(int* v, int& N);
 void reestructurarRaiz (int *apo, int pos, int tamapo);
 void insertarEnPos (int *apo, int pos);
 void HeapSort(int *v, int n);
@@ -63,6 +78,9 @@ int main(int argc, char** argv) {
 
     t0 = std::chrono::high_resolution_clock::now();
     // EliminaRepetidos(v, total_utilizados1);
+    // reestructurarRaiz(v, 0, total_utilizados1);
+    // insertarEnPos(v, total_utilizados1);
+    // HeapSort(v, total_utilizados1);
     MergeSort(v, 0, total_utilizados1-1, vaux);
     tf = std::chrono::high_resolution_clock::now();
 
@@ -79,38 +97,13 @@ int main(int argc, char** argv) {
     cerr << endl << endl;
     #endif
 
+    /***********************************************************************/
+    // Mostramos el tiempo de ejecución
+    
     cout << N << "\t" << duration << endl;
 
 
     return 0;
-
-}
-
-void EliminaRepetidos(int* v, int& N) {
-
-    int i = 0;
-
-    for (int i = 0; i < N-1; i++) {
-
-        int j = i+1;
-
-        while (j < N-1) {
-
-            if (v[i] == v[j]){
-                for (int k = j; k < N-1; k++){
-                    v[k] = v[k+1];
-                }
-
-                N--;
-
-            }
-            else{
-                j++;
-            }
-
-        }
-
-    }
 
 }
 

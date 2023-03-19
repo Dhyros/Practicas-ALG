@@ -1,3 +1,19 @@
+/***************************************************************************/
+// ALGORITMICA
+// 
+// AUTORES:
+//  - Javier Montaño Rubio
+//  - Hossam El Amraoui Leghzali
+//  - Raul Granados Lopez
+//
+// Fichero con solucion al ejercicio 1 del apartado 2.1. Utilizado para
+// obtener los datos de los tiempos de ejecucion.
+//
+// Fichero: ej2.1.1.cpp
+//
+// Fecha: 19/03/2023
+/***************************************************************************/
+
 #include <iostream>
 #include <iomanip>
 #include <chrono>
@@ -72,7 +88,10 @@ int main(int argc, char** argv) {
     cerr << endl << endl;
     #endif
 
-    cout << /*N << "\t" <<*/ duration << endl;
+    /***********************************************************************/
+    // Mostramos el tiempo de ejecución
+
+    cout << N << "\t" << duration << endl;
 
 
     return 0;
