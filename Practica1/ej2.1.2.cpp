@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     // Comprobación de argumentos
 
     if (argc != 3) {
-        
+
         cerr << "Número de argumentos incorrecto." << endl;
         cerr << "Uso: " << argv[0] << " <N> <semilla>" << endl;
         exit(-1);
@@ -78,13 +78,13 @@ int main(int argc, char** argv) {
 
 }
 
-int* EliminaRepetidos(int* v, int& N) {
-    
+void EliminaRepetidos(int* v, int& N) {
+
     int i = 0;
     while (i < N) {
 
         if (v[i] == v[i+1]) {
-                
+
             for (int j=i; j<N-1; j++) {
                 v[j] = v[j+1];
             }
@@ -95,6 +95,4 @@ int* EliminaRepetidos(int* v, int& N) {
             i++;
         }
     }
-
-    return v;
 }
