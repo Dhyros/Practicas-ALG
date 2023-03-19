@@ -85,21 +85,25 @@ void EliminaRepetidos(int* v, int& N) {
 
     while (i < N) {
 
-        int j = 0;
+        int j = i+1;
 
-        while (j < N) {
+        while (j < N-1) {
 
             if (v[i] == v[j]){
-                for (int k = i; k < N-1; k++){
+                for (int k = j; k < N-1; k++){
                     v[k] = v[k+1];
-                    j = 0;
-                    N--;
                 }
-            }else{
-                i++;
+
+                N--;
+
+            }
+            else{
+                j++;
             }
 
         }
+
+        i++;
 
     }
 
