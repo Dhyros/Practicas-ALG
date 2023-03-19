@@ -83,7 +83,7 @@ void EliminaRepetidos(int* v, int& N) {
 
     int i = 0;
 
-    while (i < N) {
+    for (int i = 0; i < N-1; i++) {
 
         int j = i+1;
 
@@ -102,8 +102,6 @@ void EliminaRepetidos(int* v, int& N) {
             }
 
         }
-
-        i++;
 
     }
 
