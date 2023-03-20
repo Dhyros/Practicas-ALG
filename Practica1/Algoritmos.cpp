@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     /***********************************************************************/
     // Mostramos el tiempo de ejecución
     
-    cout << N << "\t" << duration << endl;
+    cout << /*N << "\t" <<*/ duration << endl;
 
 
     return 0;
