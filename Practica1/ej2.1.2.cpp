@@ -22,6 +22,8 @@ using namespace std;
 
 void EliminaRepetidos(int* v1, int& N);
 
+void OrdenaBurbuja(int *v, int n);
+
 // #define DEBUG
 
 int main(int argc, char** argv) {
@@ -71,6 +73,8 @@ int main(int argc, char** argv) {
     /***********************************************************************/
     // Medición del tiempo (en nanosegundos)
 
+    OrdenaBurbuja(v1, total_utilizados1);
+
     t0 = std::chrono::high_resolution_clock::now();
     EliminaRepetidos(v1, total_utilizados1);
     tf = std::chrono::high_resolution_clock::now();
@@ -91,7 +95,7 @@ int main(int argc, char** argv) {
     /***********************************************************************/
     // Mostramos el tiempo de ejecución
     
-    cout << N << "\t" << duration << endl;
+    cout << /*N << "\t" <<*/ duration << endl;
 
     return 0;
 
@@ -114,4 +118,26 @@ void EliminaRepetidos(int* v, int& N) {
             i++;
         }
     }
+}
+
+void OrdenaBurbuja(int *v, int n) {
+	
+	int i, j, aux;
+	bool haycambios= true;
+	
+	i= 0;
+	while (haycambios) {
+		
+	 haycambios=false; // Suponemos vector ya ordenado
+	 for (j= n-1; j>i; j--) { // Recorremos vector de final a i
+		 
+		 if (v[j-1]>v[j]) { // Dos elementos consecutivos mal ordenados
+		  aux= v[j]; // Los intercambiamos
+		  v[j]= v[j-1];
+		  v[j-1]= aux;
+		  haycambios= true; // Al intercambiar, hay cambio
+		 }
+	 }
+	 i++;
+	}
 }
