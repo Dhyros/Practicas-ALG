@@ -33,7 +33,7 @@ vector<Punto> DyV (vector<Punto> p, int k, int n){
             }
 
         if (mayorTodos && mayorUno)
-            puntosNoDominados.add (p[i]);
+            puntosNoDominados.push (p[i]);
 
     }
 
