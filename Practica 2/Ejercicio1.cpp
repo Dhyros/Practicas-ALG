@@ -16,23 +16,30 @@ struct Punto{
 
 vector<Punto> DyV (vector<Punto> p, int k, int n){
     vector<Puntos> puntosNoDominados;
-    bool mayorTodos, mayorUno;
 
-    for (int i=0; i<n-1; i++){
-        mayorTodos=true;
-        mayorUno=false;
+    for (int i=0; i<n; i++){
+        bool dominado=false;
 
-        for (int j=i+1; j<n; j++)
+        for (int j=0; j<n; j++){
+            bool mayorUno=false, mayorTodos=true;
+            
             for (int a=0; a<k; a++){
 
-                if (p[i][a] < p[j][a])
+                if (p[i][a] > p[j][a])
                     mayorTodos = false;
-                else if (p[i][a] > p[j][a])
-                    mayorUno=true;
+
+                else if (p[i][a] < p[j][a])
+                    mayorUno = true;
 
             }
 
-        if (mayorTodos && mayorUno)
+            if (mayorUno && mayorTodos){
+                dominado=true;
+                break;
+            }
+        }
+
+        if (!dominado)
             puntosNoDominados.push (p[i]);
 
     }
