@@ -1,21 +1,16 @@
 #include <iostream>
 #include <vector>
 
+using namespace std;
+
 struct Punto{
-    int x;
-    int y;
-    int a;
-    int b;
-    int c;
-    int d;
-    int e;
-    int f;
-    int g;
-    int h;
+    vector<int> coordenadas;
+
+    // bool operator > (const Punto & p2);
 };
 
 vector<Punto> DyV (vector<Punto> p, int k, int n){
-    vector<Puntos> puntosNoDominados;
+    vector<Punto> puntosNoDominados;
 
     for (int i=0; i<n; i++){
         bool dominado=false;
