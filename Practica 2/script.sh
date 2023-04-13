@@ -1,24 +1,54 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
+file="pts.txt"
+
+if [ $# -ne 2 ]; then
     printf "ERROR: Invalid number of arguments\n"
-    printf "Usage: %s <amount of points>\n" $0
+    printf "Usage: %s <dimension> <amount of points>\n" $0
+    exit -1
+elif [ $1 -le 1 ]; then
+    printf "ERROR: Invalid dimension\n"
+    printf "Dimension must be greater or equal to 2\n"
     exit -1
 fi
 
 #############################################################################
-#                               COMPILATION                                 #
-#############################################################################
+# COMPILATIONN
 
-g++ generador_puntos.cpp -o generador_puntos_exe
-
-g++ Practica2.cpp -o Practica2_exe
+make
 
 #############################################################################
-#                                EJECUCIÓN                                  #
+# EXECUTION
+
+printf "Generating points ... "
+
+# Dimension and amount of points
+printf "$1 $2\n\n" > $file
+
+# Number of elemnts
+for ((i=0; i<$2; i++)); do
+    # Insertion of points
+    Arr=()
+    for ((j=0; j<$1; j++)); do
+        Arr+=($(($RANDOM%100)))
+    done
+    printf "${Arr[*]}\n" >> $file
+done
+printf "Points generated\n"
+
+
+#############################################################################
+# Executions
 #############################################################################
 
-printf "Generando puntos ... "
-./generador_puntos_exe $1
-printf "Puntos generados\n"
+./Ejercicio1_exe pts.txt > sol.txt
 
+n=`cat pts.txt | wc -l`
+n=$((n-2))
+tail -n$n pts.txt > puntos.txt
+
+sort sol.txt > sorted_sol.txt
+
+gnuplot plot.p
+
+rm pts.txt sol.txt
