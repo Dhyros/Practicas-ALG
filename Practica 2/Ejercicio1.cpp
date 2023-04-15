@@ -14,7 +14,7 @@ struct Punto{
         bool domina = true;
 
         for (int i=0; i<coordenadas.size() && domina; i++) {
-            if (coordenadas[i] > p2.coordenadas[i]) {
+            if (coordenadas[i] < p2.coordenadas[i]) {
                 domina = false;
             }
         }
@@ -32,7 +32,7 @@ vector<Punto> MetodoBasico (vector<Punto> p, int k, int n){
         bool dominado=false;
 
         for (int j=0; j<n && !dominado; j++) {
-            if (p[i].Domina(p[j]) && i!=j) {
+            if (p[j].Domina(p[i]) && i!=j) {
                 dominado = true;
             }
         }
@@ -45,21 +45,37 @@ vector<Punto> MetodoBasico (vector<Punto> p, int k, int n){
     return puntosNoDominados;
 }
 
+void Fusiona (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
+
+    for (int i=0; i < p1.size(); ++i){
+        puntosNoDominados.push_back(p1[i]);
+    }
+
+    for (int i=0; i < p2.size(); ++i){
+        puntosNoDominados.push_back(p2[i]);
+    }
+
+}
+
 vector<Punto> DyV1 (vector<Punto> p, int k, int n) {
     vector<Punto> puntosNoDominados;
 
-    if (n==2) {
+    if (n <= 2) {
         for (Punto punto : MetodoBasico(p, k, n))
             puntosNoDominados.push_back(punto);
     }
     else {
-        // vector<Punto>::const_iterator it = p.cbegin() + n/2;
-        // vector<Punto> p1(p.cbegin(), it);
-        // vector<Punto> p2(it, p.cend());
+        vector<Punto>::const_iterator it = p.cbegin() + n/2;
+        vector<Punto> p1(p.cbegin(), it);
+        vector<Punto> p2(it, p.cend());
 
-        // p1 = DyV1(p, k, n/2);
-        // p2 = DyV1(p, k, n/2);
+        vector<Punto> temp1 = DyV1(p1, k, n/2);
+        vector<Punto> temp2 = DyV1(p2, k, n/2);
+
+        Fusiona (puntosNoDominados, temp1, temp2);
     }
+
+    return puntosNoDominados;
 }
 
 using namespace std;
@@ -88,8 +104,6 @@ int main(int argc, char const **argv){
 
     fi >> k >> n;
 
-    puntosNoDominados = MetodoBasico(puntos, k, n);
-
     for (int i=0; i<n; i++){
         
         Punto p;
@@ -101,6 +115,8 @@ int main(int argc, char const **argv){
         
         puntos.push_back(p);
     }
+
+    puntosNoDominados = DyV1(puntos, k, n);
 
     for (int i=0; i<puntosNoDominados.size(); i++){
         for (int j=0; j<k; j++)
