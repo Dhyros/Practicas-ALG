@@ -47,10 +47,8 @@ vector<Punto> MetodoBasico (vector<Punto> p, int k, int n){
 
 void Fusiona (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
 
-    for (int i=0; i < p1.size(); ++i){
-        puntosNoDominados.push_back(p1[i]);
-    }
-
+    puntosNoDominados = p1;
+    
     for (int i=0; i < p2.size(); ++i){
         puntosNoDominados.push_back(p2[i]);
     }
@@ -73,6 +71,8 @@ vector<Punto> DyV1 (vector<Punto> p, int k, int n) {
         vector<Punto> temp2 = DyV1(p2, k, n/2);
 
         Fusiona (puntosNoDominados, temp1, temp2);
+
+        puntosNoDominados = MetodoBasico(puntosNoDominados, k, puntosNoDominados.size());
     }
 
     return puntosNoDominados;
