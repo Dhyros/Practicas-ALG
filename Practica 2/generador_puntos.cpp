@@ -1,7 +1,7 @@
 /***************************************************************************/
 // Fichero que genera puntos aleatorios con coordenadas entre 0 y 99.
-// 
-// COMPILACION: 
+//
+// COMPILACION:
 //      g++ generador_puntos.cpp -o generador_puntos
 /***************************************************************************/
 
@@ -33,6 +33,6 @@ int main(int argc, char **argv) {
 
 
     for (int i=0; i<n; i++) {
-        file << setw(2) << rand()%100 << setw(3) << rand()%100 << endl;
+        file << setw(2) << rand()%100 << setw(3) << rand()%100 << setw(3) << rand()%100 << endl;
     }
 }

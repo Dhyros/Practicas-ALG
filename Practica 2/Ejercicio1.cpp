@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -9,11 +10,11 @@ const int TAM = 100;
 struct Punto{
     vector<int> coordenadas;
 
-    bool Domina (const Punto & p2) {
+    bool Domina (const Punto & p2) { //O(n)
 
         bool domina = true;
 
-        for (int i=0; i<coordenadas.size() && domina; i++) {
+        for (int i=0; i<coordenadas.size() && domina; i++) { //O(n)
             if (coordenadas[i] < p2.coordenadas[i]) {
                 domina = false;
             }
@@ -23,16 +24,20 @@ struct Punto{
     }
 };
 
+bool ComparaPunto (Punto p1, Punto p2){
+    return p1.coordenadas[0] > p2.coordenadas[0];
+}
+
 // Clase Matriz n dimensional
 
 vector<Punto> MetodoBasico (vector<Punto> p, int n){
     vector<Punto> puntosNoDominados;
 
-    for (int i=0; i<n; i++) {  //O(n^2)
+    for (int i=0; i<n; i++) {  //O(n^3)
         bool dominado=false;
 
-        for (int j=0; j<n && !dominado; j++) {  //O(n)
-            if (p[j].Domina(p[i]) && i!=j) {
+        for (int j=0; j<n && !dominado; j++) {  //O(n^2)
+            if (p[j].Domina(p[i]) && i!=j) { //O(n)
                 dominado = true;
             }
         }
@@ -77,13 +82,28 @@ vector<Punto> DyV1 (vector<Punto> p, int n) {
 
 void Fusiona2 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
 
-    vector<Punto> auxiliar = p1;
-    for (int i=0; i < p2.size(); ++i){
+    vector<Punto> auxiliar = p1; //O(n)
+    for (int i=0; i < p2.size(); ++i){ //O(n)
         auxiliar.push_back(p2[i]);
     }
 
-    puntosNoDominados = MetodoBasico(auxiliar, auxiliar.size());
+    for (int j=0; j<auxiliar[0].coordenadas.size(); ++j) { //O(n)
+        int max = 0, ult=0;
+        sort(auxiliar.begin(), auxiliar.end(), ComparaPunto); //O(nlogn)
 
+        for (int i=0; i<auxiliar.size(); ++i) { //O(n)
+            if (auxiliar[i].coordenadas[j] > max && auxiliar[i].coordenadas[0] == ult){
+                max = auxiliar[i].coordenadas[j];
+                puntosNoDominados.pop_back();
+                puntosNoDominados.push_back(auxiliar[i]);
+            }
+            else if (auxiliar[i].coordenadas[j] > max){
+                ult = auxiliar[i].coordenadas[0];
+                max = auxiliar[i].coordenadas[j];
+                puntosNoDominados.push_back(auxiliar[i]);
+            }
+        }
+    }
 }
 
 vector<Punto> DyV2 (vector<Punto> p, int n) {
@@ -147,6 +167,10 @@ int main(int argc, char const **argv){
     puntosNoDominadosDyV1 = DyV1(puntos, n);
     puntosNoDominadosDyV2 = DyV2(puntos, n);
     puntosNoDominadosBasico = MetodoBasico(puntos, n);
+
+    sort (puntosNoDominadosDyV1.begin(), puntosNoDominadosDyV1.end(), ComparaPunto);
+    //sort (puntosNoDominadosDyV2.begin(), puntosNoDominadosDyV2.end(), ComparaPunto);
+    sort (puntosNoDominadosBasico.begin(), puntosNoDominadosBasico.end(), ComparaPunto);
 
     cout << "Puntos no dominados con DyV1 " << endl;
 
