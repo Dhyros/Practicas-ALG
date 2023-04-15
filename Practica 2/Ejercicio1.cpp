@@ -10,7 +10,7 @@ struct Punto{
     vector<int> coordenadas;
 
     bool Domina (const Punto & p2) {
-        
+
         bool domina = true;
 
         for (int i=0; i<coordenadas.size() && domina; i++) {
@@ -25,13 +25,13 @@ struct Punto{
 
 // Clase Matriz n dimensional
 
-vector<Punto> MetodoBasico (vector<Punto> p, int k, int n){
+vector<Punto> MetodoBasico (vector<Punto> p, int n){
     vector<Punto> puntosNoDominados;
 
-    for (int i=0; i<n; i++) {
+    for (int i=0; i<n; i++) {  //O(n^2)
         bool dominado=false;
 
-        for (int j=0; j<n && !dominado; j++) {
+        for (int j=0; j<n && !dominado; j++) {  //O(n)
             if (p[j].Domina(p[i]) && i!=j) {
                 dominado = true;
             }
@@ -45,34 +45,62 @@ vector<Punto> MetodoBasico (vector<Punto> p, int k, int n){
     return puntosNoDominados;
 }
 
-void Fusiona (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
+void Fusiona1 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
 
     puntosNoDominados = p1;
-    
-    for (int i=0; i < p2.size(); ++i){
+    for (int i=0; i < p2.size(); ++i)
         puntosNoDominados.push_back(p2[i]);
-    }
 
 }
 
-vector<Punto> DyV1 (vector<Punto> p, int k, int n) {
+vector<Punto> DyV1 (vector<Punto> p, int n) {
     vector<Punto> puntosNoDominados;
 
-    if (n <= 2) {
-        for (Punto punto : MetodoBasico(p, k, n))
-            puntosNoDominados.push_back(punto);
-    }
+    if (n == 1)
+        puntosNoDominados = MetodoBasico(p, n);
+
     else {
         vector<Punto>::const_iterator it = p.cbegin() + n/2;
         vector<Punto> p1(p.cbegin(), it);
         vector<Punto> p2(it, p.cend());
 
-        vector<Punto> temp1 = DyV1(p1, k, n/2);
-        vector<Punto> temp2 = DyV1(p2, k, n/2);
+        vector<Punto> temp1 = DyV1(p1, n/2);
+        vector<Punto> temp2 = DyV1(p2, n - n/2);
 
-        Fusiona (puntosNoDominados, temp1, temp2);
+        Fusiona1 (puntosNoDominados, temp1, temp2);
 
-        puntosNoDominados = MetodoBasico(puntosNoDominados, k, puntosNoDominados.size());
+        puntosNoDominados = MetodoBasico(puntosNoDominados, puntosNoDominados.size());
+    }
+
+    return puntosNoDominados;
+}
+
+void Fusiona2 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
+
+    vector<Punto> auxiliar = p1;
+    for (int i=0; i < p2.size(); ++i){
+        auxiliar.push_back(p2[i]);
+    }
+
+    puntosNoDominados = MetodoBasico(auxiliar, auxiliar.size());
+
+}
+
+vector<Punto> DyV2 (vector<Punto> p, int n) {
+    vector<Punto> puntosNoDominados;
+
+    if (n == 1)
+        puntosNoDominados = MetodoBasico(p, n);
+
+    else {
+        vector<Punto>::const_iterator it = p.cbegin() + n/2;
+        vector<Punto> p1(p.cbegin(), it);
+        vector<Punto> p2(it, p.cend());
+
+        vector<Punto> temp1 = DyV2(p1, n/2);
+        vector<Punto> temp2 = DyV2(p2, n - n/2);
+
+        Fusiona2 (puntosNoDominados, temp1, temp2);
     }
 
     return puntosNoDominados;
@@ -89,7 +117,7 @@ int main(int argc, char const **argv){
     }
 
     vector<Punto> puntos;
-    vector<Punto> puntosNoDominados;
+    vector<Punto> puntosNoDominadosBasico, puntosNoDominadosDyV1, puntosNoDominadosDyV2;
 
     string filename = argv[1];
 
@@ -105,22 +133,46 @@ int main(int argc, char const **argv){
     fi >> k >> n;
 
     for (int i=0; i<n; i++){
-        
+
         Punto p;
         int coord;
         for (int j=0; j<k; j++) {
             fi >> coord;
             p.coordenadas.push_back(coord);
         }
-        
+
         puntos.push_back(p);
     }
 
-    puntosNoDominados = DyV1(puntos, k, n);
+    puntosNoDominadosDyV1 = DyV1(puntos, n);
+    puntosNoDominadosDyV2 = DyV2(puntos, n);
+    puntosNoDominadosBasico = MetodoBasico(puntos, n);
 
-    for (int i=0; i<puntosNoDominados.size(); i++){
+    cout << "Puntos no dominados con DyV1 " << endl;
+
+    for (int i=0; i<puntosNoDominadosDyV1.size(); i++){
         for (int j=0; j<k; j++)
-            cout << puntosNoDominados[i].coordenadas[j] << " ";
+            cout << puntosNoDominadosDyV1[i].coordenadas[j] << " ";
+        cout << endl;
+    }
+
+    cout << endl;
+
+    cout << "Puntos no dominados con DyV2 " << endl;
+
+    for (int i=0; i<puntosNoDominadosDyV2.size(); i++){
+        for (int j=0; j<k; j++)
+            cout << puntosNoDominadosDyV2[i].coordenadas[j] << " ";
+        cout << endl;
+    }
+
+    cout << endl;
+
+    cout << "Puntos no dominados con método básico " << endl;
+
+    for (int i=0; i<puntosNoDominadosBasico.size(); i++){
+        for (int j=0; j<k; j++)
+            cout << puntosNoDominadosBasico[i].coordenadas[j] << " ";
         cout << endl;
     }
 
