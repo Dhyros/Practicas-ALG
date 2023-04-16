@@ -41,14 +41,14 @@ printf "Points generated\n"
 # Executions
 #############################################################################
 
-./Ejercicio1_exe pts.txt > sol.txt
+# ./Ejercicio1_exe pts.txt > sol.txt
 
-n=`cat pts.txt | wc -l`
-n=$((n-2))
-tail -n$n pts.txt > puntos.txt
+# n=`cat pts.txt | wc -l`
+# n=$((n-2))
+# tail -n$n pts.txt > puntos.txt
 
-sort sol.txt > sorted_sol.txt
+# sort sol.txt > sorted_sol.txt
 
-gnuplot plot.p
+# gnuplot plot.p
 
-rm pts.txt sol.txt
+# rm  sol.txt
