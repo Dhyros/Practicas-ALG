@@ -15,7 +15,7 @@ fi
 #############################################################################
 # COMPILATIONN
 
-make > /dev/null
+make
 
 #############################################################################
 # EXECUTION
@@ -36,19 +36,3 @@ for ((i=0; i<$2; i++)); do
 done
 printf "Points generated\n"
 
-
-#############################################################################
-# Executions
-#############################################################################
-
-# ./Ejercicio1_exe pts.txt > sol.txt
-
-# n=`cat pts.txt | wc -l`
-# n=$((n-2))
-# tail -n$n pts.txt > puntos.txt
-
-# sort sol.txt > sorted_sol.txt
-
-# gnuplot plot.p
-
-# rm  sol.txt

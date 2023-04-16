@@ -31,11 +31,11 @@ struct Punto{
     vector<int> coordenadas;
 
     // Devuelve si se domina a p2
-    bool Domina (const Punto & p2) { //O(n)
+    bool Domina (const Punto & p2) {
 
         bool domina = true;
 
-        for (int i=0; i<coordenadas.size() && domina; i++) { //O(n)
+        for (int i=0; i<coordenadas.size() && domina; i++) {
             if (coordenadas[i] < p2.coordenadas[i]) {
                 domina = false;
             }
@@ -75,11 +75,12 @@ vector<Punto> MetodoBasico (vector<Punto> p, int n){
 
 }
 
-void Fusiona1 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
+void Fusiona1 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) { // O(n^3)
 
     vector<Punto> aux = p1;
-    for (int i=0; i < p2.size(); ++i)
+    for (int i=0; i < p2.size(); ++i) { // O(n)
         aux.push_back(p2[i]);
+    }
 
     for (int i=0; i<aux.size(); i++) {  //O(n^3)
         bool dominado=false;
@@ -97,7 +98,7 @@ void Fusiona1 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, cons
 
 }
 
-vector<Punto> DyV1 (vector<Punto> p, int n) {
+vector<Punto> DyV1 (vector<Punto> p, int n) { // O(n^3)
     vector<Punto> puntosNoDominados;
 
     if (n == 1)
@@ -108,10 +109,10 @@ vector<Punto> DyV1 (vector<Punto> p, int n) {
         vector<Punto> p1(p.cbegin(), it);
         vector<Punto> p2(it, p.cend());
 
-        vector<Punto> temp1 = DyV1(p1, n/2);
-        vector<Punto> temp2 = DyV1(p2, n - n/2);
+        vector<Punto> temp1 = DyV1(p1, n/2);        // T(n/2)
+        vector<Punto> temp2 = DyV1(p2, n - n/2);    // T(n/2)
 
-        Fusiona1 (puntosNoDominados, temp1, temp2);
+        Fusiona1 (puntosNoDominados, temp1, temp2); // O(n^3)
 
     }
 
