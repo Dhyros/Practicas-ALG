@@ -50,6 +50,22 @@ vector<Punto> MetodoBasico (vector<Punto> p, int n){
     return puntosNoDominados;
 }
 
+void OrdenaCoordenada (vector<Punto> & p, int coord) {
+    bool cambio = true;
+
+    for (int i=0; i<p.size() && cambio; ++i) {
+        cambio = false;
+
+        for (int j=0; j<p.size()-1; ++j) {
+            if (p[j].coordenadas[coord] > p[j+1].coordenadas[coord]) {
+                Punto aux = p[j];
+                p[j] = p[j+1];
+                p[j+1] = aux;
+                cambio = true;
+            }
+        }
+    }
+}
 void Fusiona1 (vector<Punto> & puntosNoDominados, const vector<Punto> & p1, const vector<Punto> & p2) {
 
     puntosNoDominados = p1;
