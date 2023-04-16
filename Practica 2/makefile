@@ -12,9 +12,9 @@
 # 
 #***************************************************************************#
 
-all: Ejercicio1_exe
+all: Practica2_exe
 
-Ejercicio1_exe: Ejercicio1.cpp
+Practica2_exe: Ejercicio1.cpp
 	@echo Creando $@
 	@g++ $< -o $@
 

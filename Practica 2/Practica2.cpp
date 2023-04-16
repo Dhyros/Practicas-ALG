@@ -1,3 +1,19 @@
+/***************************************************************************/
+// ALGORITMICA
+// 
+// AUTORES:
+//  - Javier Montaño Rubio
+//  - Hossam El Amraoui Leghzali
+//  - Raul Granados Lopez
+//
+// Fichero con solucion a los apartados 1 y 3 del punto 3 ("Tareas a realizar").
+// Utilizado para obtener los datos de los tiempos de ejecucion.
+//
+// Fichero: Practica2.cpp
+//
+// Fecha: 16/04/2023
+/***************************************************************************/
+
 #include <iostream>
 #include <fstream>
 #include <vector>
