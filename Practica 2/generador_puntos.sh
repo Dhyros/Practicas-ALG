@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file="pts.txt"
+file="puntos.txt"
 
 if [ $# -ne 2 ]; then
     printf "ERROR: Invalid number of arguments\n"
@@ -11,11 +11,6 @@ elif [ $1 -le 1 ]; then
     printf "Dimension must be greater or equal to 2\n"
     exit -1
 fi
-
-#############################################################################
-# COMPILATIONN
-
-make
 
 #############################################################################
 # EXECUTION

@@ -14,7 +14,7 @@
 
 all: Practica2_exe
 
-Practica2_exe: Ejercicio1.cpp
+Practica2_exe: Practica2.cpp
 	@echo Creando $@
 	@g++ $< -o $@
 
