@@ -300,31 +300,35 @@ int main(int argc, char const **argv){
         puntos.push_back(p);
     }
 
+	cout << n << "\t";
     time_point<steady_clock> ini = steady_clock::now();
     puntosNoDominadosDyV1 = DyV1(puntos, n);
     time_point<steady_clock> fin = steady_clock::now();
     milliseconds_f duracion = (fin - ini);
-    cout << "Duración DyV1: " << duracion.count() << " ms" << endl;
-
+    cout << /*"Duración DyV1: " << */duracion.count()/* << " ms" << endl*/;
+	cout << "\t";
+	
     ini = steady_clock::now();
     puntosNoDominadosDyV2 = DyV2(puntos, n);
     fin = steady_clock::now();
     duracion = (fin - ini);
-    cout << "Duración DyV2: " << duracion.count() << " ms" << endl;
-
+    cout << /*"Duración DyV2: " << */duracion.count()/* << " ms" << endl*/;
+	cout << "\t";
+	
     // puntosNoDominadosDyV3 = DyV3(puntos);
 
     ini = steady_clock::now();
     puntosNoDominadosBasico = MetodoBasico(puntos, n);
     fin = steady_clock::now();
     duracion = (fin - ini);
-    cout << "Duración Método básico: " << duracion.count() << " ms" << endl;
-
+    cout << /*"Duración Método básico: " << */duracion.count()/* << " ms" << endl*/;
+	cout << "\t";
+	
     ini = steady_clock::now();
     puntosNoDominadosBasico = MetodoBasico2(puntos, n);
     fin = steady_clock::now();
     duracion = (fin - ini);
-    cout << "Duración Método básico 2: " << duracion.count() << " ms" << endl;
+    cout << /*"Duración Método básico 2: " << */duracion.count()/* << " ms"*/ << endl;
 
     /*sort (puntosNoDominadosDyV1.begin(), puntosNoDominadosDyV1.end(), ComparaPunto);
     // sort (puntosNoDominadosDyV2.begin(), puntosNoDominadosDyV2.end(), ComparaPunto);
