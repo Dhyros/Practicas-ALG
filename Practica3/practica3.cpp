@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <set>
 #include <list>
 #include <algorithm>
@@ -11,13 +12,24 @@ enum Color {BLANCO, GRIS, NEGRO};
 
 struct nodo {
     int id_nodo;
-    vector<nodo> conexiones; // numero de aristas conectadas al nodo
+    //vector<nodo> conexiones; // numero de aristas conectadas al nodo
     Color color; // Color del nodo
     //nodo padre();
     int distancia; // Distancia a raíz del arbol
 
 
     nodo(int id) : id_nodo(id) {}
+
+    string mostrarColor(){
+        if (color == BLANCO)
+            return "BLANCO";
+        else if (color == GRIS)
+            return "GRIS";
+        else if (color == NEGRO)
+            return "NEGRO";
+        else
+            return "NO COLOR";
+    }
 
     bool operator == (const nodo &n) const{
         return id_nodo == n.id_nodo;
@@ -42,8 +54,16 @@ private:
 
 public:
 
+    const nodo & getNodo(int pos) const{
+        return nodos[pos];
+    }
+
     nodo & getNodo(int pos) {
         return nodos[pos];
+    }
+
+    void setNodo (const vector<nodo> &n){
+        nodos = n;
     }
 
     int NumNodos() const {
@@ -54,7 +74,15 @@ public:
         return aristas;
     }
 
+    void setAristas (const list<arista> &a){
+        aristas = a;
+    }
+
     const vector<nodo> & getNodos() const {
+        return nodos;
+    }
+
+    vector<nodo> & getNodos()  {
         return nodos;
     }
 
@@ -70,6 +98,16 @@ public:
         aristas.push_back(a);
     }
 
+    bool nodoRelacionado (const nodo &n1, const nodo &n2){ //O(n)
+        for (arista a : aristas){
+            if (a.first.id_nodo == n1.id_nodo && a.second.id_nodo == n2.id_nodo)
+                return true;
+            else if (a.first.id_nodo == n2.id_nodo && a.second.id_nodo == n1.id_nodo)
+                return true;
+        }
+        return false;
+    }
+
     void removeArista (arista & a){
         //aristas.erase(remove(aristas.begin(), aristas.end(), a), aristas.end());
         /* list<arista> aux;
@@ -82,11 +120,24 @@ public:
         aristas.remove(a);
     }
 
-    void BFS (int i){
-        nodo s = getNodo(i);
+    /* vector<nodo> &Conexiones (nodo &n){
+        vector<nodo> aux;
+        for (nodo i : nodos){
+            for (nodo j : i.conexiones){
+                if (j.id_nodo == n.id_nodo){
+                    aux.push_back(i);
+                }
+            }
+        }
+
+        return aux;
+    } */
+
+    void BFS (int i){ //O(n^3)
+        nodo &s = nodos[i];
         int num = nodos.size() +1;
 
-        for (nodo n : nodos){ //O(n)
+        for (nodo &n : nodos){ //O(n)
             n.color = BLANCO;
             n.distancia = num;
         }
@@ -94,23 +145,26 @@ public:
         s.color = GRIS;
         s.distancia = 0;
 
-        list<nodo> cola;
-        cola.push_back(s);
-        while (!cola.empty()){ //O(n^2)
-            nodo u = cola.front();
+        list<nodo*> cola;
+        cola.push_back(&s);
+        while (!cola.empty()){ //O(n^3)
+            nodo &u = (*cola.front());
             cola.pop_front();
 
-            for (nodo v : u.conexiones){  //O(n)
-                if (v.color == BLANCO){
-                    v.color = GRIS;
-                    v.distancia = u.distancia +1;
-                    //v.padre = u;
-                    cola.push_back(v);
-                }
+            for (nodo &v : nodos){  //O(n^2)
+                if (nodoRelacionado(v, u)) //O(n)
+                    if (v.color == BLANCO){
+                        v.color = GRIS;
+                        v.distancia = u.distancia +1;
+                        cola.push_back(&v);
+                    }
             }
 
             u.color = NEGRO;
+            //cout << u.mostrarColor() << endl;
         }
+
+        //s.color = NEGRO;
 
     }
 
@@ -140,21 +194,10 @@ public:
     } */
 };
 
-/* void eliminarArista (list<arista> &ar, arista a){
-    list<arista> aux;
-    for (arista i : ar){
-        if (i.first.id_nodo != a.first.id_nodo || i.second.id_nodo != a.second.id_nodo){
-                aux.push_back(i);
-            }
-    }
-    ar = aux;
-
-} */
-
 list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(n)
     list<arista> solucion;
 
-    for (auto i : aristas) {
+    for (arista i : aristas) {
         if (i.first.id_nodo == n.id_nodo || i.second.id_nodo == n.id_nodo) {
             solucion.push_back(i);
         }
@@ -163,21 +206,22 @@ list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(n)
     return solucion;
 }
 
-bool grafoSigueConexo (const Grafo &g, arista &arist){
-    Grafo aux = g;
+bool grafoSigueConexo (const Grafo &g, arista &arist){ // O(n^3)
+    Grafo aux;
+    aux.setNodo(g.getNodos());
+    aux.setAristas(g.getAristas());
 
     aux.removeArista(arist); // O(n)
-    nodo s = aux.getNodo(0);
-    aux.BFS(0); // O(n^2)
+    aux.BFS(0); // O(n^3)
 
-    for (nodo n : aux.getNodos()){ // O(n)
+    for (nodo &n : aux.getNodos()){ // O(n)
         if (n.color != NEGRO) return false;
     }
 
     return true;
 }
 
-list<arista> Greedy (const Grafo & g) {
+list<arista> Greedy (const Grafo & g) {  //O(n^4)
     list<arista> solucion;
     list<arista> aristas = g.getAristas();
 
@@ -185,14 +229,13 @@ list<arista> Greedy (const Grafo & g) {
         return solucion;
     }
 
-    nodo v = g.getNodos()[0];
-    while (solucion.size() != g.NumAristas()) {  //O(n^3)
+    nodo v = g.getNodo(0);
+
+    while (solucion.size() != g.NumAristas()) {  //O(n^4)
         list<arista> aristasV = aristasUnidasaNodo(v, aristas);
 
         if (aristasV.size() == 1) {
             solucion.push_back(aristasV.front());
-            //aristas.erase(find(aristas.begin(), aristas.end(), aristasV.front())); //O(n)
-            //eliminarArista(aristas, aristasV[0]);
             aristas.remove(aristasV.front());
 
             if (aristasV.front().first.id_nodo == v.id_nodo) v = aristasV.front().second;
@@ -200,19 +243,15 @@ list<arista> Greedy (const Grafo & g) {
 
         } else {
 
-            int i=0;
-            while (!grafoSigueConexo(g, aristasV.front())) { // O(n^2)
-                aristasV.pop_front();
-                ++i;
+            while (!grafoSigueConexo(g, aristasV.back())) { // O(n^3)
+                aristasV.pop_back();
             }
 
-            solucion.push_back(aristasV.front());
-            //aristas.erase(find(aristas.begin(), aristas.end(), aristasV.front())); // O(n)
-            //eliminarArista(aristas, aristasV[i]);
-            aristas.remove(aristasV.front());
+            solucion.push_back(aristasV.back());
+            aristas.remove(aristasV.back());
 
-            if (aristasV.front().first.id_nodo == v.id_nodo) v = aristasV.front().second;
-            else  v = aristasV.front().first;
+            if (aristasV.back().first.id_nodo == v.id_nodo) v = aristasV.back().second;
+            else  v = aristasV.back().first;
         }
     }
 
@@ -246,41 +285,88 @@ int main() {
     }
 
     return 0; */
-    Grafo g;
+
+    /* Grafo g;
     list<arista> aristas;
 
-    nodo n0(0);
     nodo n1(1);
     nodo n2(2);
     nodo n3(3);
     nodo n4(4);
     nodo n5(5);
+    nodo n6(6);
+    nodo n7(7);
+    nodo n8(8);
+    nodo n9(9);
+    nodo n10(10);
 
-    n0.conexiones.push_back(n1); n0.conexiones.push_back(n2);
-    //aristas.push_back({n0, n1}); aristas.push_back({n0, n2});
-    aristas.push_back(arista(n0, n1)); aristas.push_back(arista(n0, n2));
+    arista a1 = arista(n1, n2), a2 = arista(n1, n7), a3 = arista(n1, n6), a4 = arista(n1, n5);
+    aristas.push_back(a1); aristas.push_back(a2); aristas.push_back(a3); aristas.push_back(a4);
 
-    n1.conexiones.push_back(n0); n1.conexiones.push_back(n2); n1.conexiones.push_back(n3); n1.conexiones.push_back(n4);
-    //aristas.push_back({n1, n0}); aristas.push_back({n1, n2}); aristas.push_back({n1, n3}); aristas.push_back({n1, n4});
-    aristas.push_back(arista(n1, n0)); aristas.push_back(arista(n1, n2)); aristas.push_back(arista(n1, n3)); aristas.push_back(arista(n1, n4));
+    arista a5 = arista(n2, n7), a6 = arista(n2, n8), a7 = arista(n2, n3);
+    aristas.push_back(a5); aristas.push_back(a6); aristas.push_back(a7);
 
-    n2.conexiones.push_back(n0); n2.conexiones.push_back(n1); n2.conexiones.push_back(n3); n2.conexiones.push_back(n4);
-    //aristas.push_back({n2, n0}); aristas.push_back({n2, n1}); aristas.push_back({n2, n3}); aristas.push_back({n2, n4});
-    aristas.push_back(arista(n2, n0)); aristas.push_back(arista(n2, n1)); aristas.push_back(arista(n2, n3)); aristas.push_back(arista(n2, n4));
+    arista a8 = arista(n3, n8), a9 = arista(n3, n9), a10 = arista(n3, n4);
+    aristas.push_back(a8); aristas.push_back(a9); aristas.push_back(a10);
 
-    n3.conexiones.push_back(n1); n3.conexiones.push_back(n2); n3.conexiones.push_back(n4); n3.conexiones.push_back(n5);
-    //aristas.push_back({n3, n1}); aristas.push_back({n3, n2}); aristas.push_back({n3, n4}); aristas.push_back({n3, n5});
-    aristas.push_back(arista(n3, n1)); aristas.push_back(arista(n3, n2)); aristas.push_back(arista(n3, n4)); aristas.push_back(arista(n3, n5));
+    arista a11 = arista(n4, n9), a12 = arista(n4, n10), a13 = arista(n4, n5);
+    aristas.push_back(a11); aristas.push_back(a12); aristas.push_back(a13);
 
-    n4.conexiones.push_back(n1); n4.conexiones.push_back(n2); n4.conexiones.push_back(n3); n4.conexiones.push_back(n5);
-    //aristas.push_back({n4, n1}); aristas.push_back({n4, n2}); aristas.push_back({n4, n3}); aristas.push_back({n4, n5});
-    aristas.push_back(arista(n4, n1)); aristas.push_back(arista(n4, n2)); aristas.push_back(arista(n4, n3)); aristas.push_back(arista(n4, n5));
+    arista a14 = arista(n5, n10), a15 = arista(n5, n6);
+    aristas.push_back(a14); aristas.push_back(a15);
 
-    n5.conexiones.push_back(n3); n5.conexiones.push_back(n4);
-    //aristas.push_back({n5, n3}); aristas.push_back({n5, n4});
-    aristas.push_back(arista(n5, n3)); aristas.push_back(arista(n5, n4));
+    arista a16 = arista(n6, n10), a17 = arista(n6, n7);
+    aristas.push_back(a16); aristas.push_back(a17);
 
-    g.pushNodo(n0); g.pushNodo(n1); g.pushNodo(n2); g.pushNodo(n3); g.pushNodo(n4); g.pushNodo(n5);
+    arista a18 = arista(n7, n8);
+    aristas.push_back(a18);
+
+    arista a19 = arista(n8, n9);
+    aristas.push_back(a19);
+
+    arista a20 = arista(n9, n10);
+    aristas.push_back(a20);
+
+    g.pushNodo(n1); g.pushNodo(n2); g.pushNodo(n3); g.pushNodo(n4); g.pushNodo(n5);
+    g.pushNodo(n6); g.pushNodo(n7); g.pushNodo(n8); g.pushNodo(n9); g.pushNodo(n10);
+
+    for (auto i : aristas) {
+        g.pushArista(i);
+    }
+
+    list<arista> solucion = Greedy(g);
+
+    for (auto i : solucion) {
+        cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
+    } */
+
+    Grafo g;
+    list<arista> aristas;
+
+    nodo n1(1);
+    nodo n2(2);
+    nodo n3(3);
+    nodo n4(4);
+    nodo n5(5);
+    nodo n6(6);
+
+    arista a1 = arista(n1, n2), a2 = arista(n1, n6), a3 = arista(n1, n4), a4 = arista(n1, n5);
+    aristas.push_back(a1); aristas.push_back(a2); aristas.push_back(a3); aristas.push_back(a4);
+
+    arista a5 = arista(n2, n6), a6 = arista(n2, n3), a7 = arista(n2, n5);
+    aristas.push_back(a5); aristas.push_back(a6); aristas.push_back(a7);
+
+    arista a8 = arista(n3, n4);
+    aristas.push_back(a8);
+
+    arista a9 = arista(n4, n5), a10 = arista(n4, n6);
+    aristas.push_back(a9); aristas.push_back(a10);
+
+    arista a11 = arista(n5, n6);
+    aristas.push_back(a11);
+
+    g.pushNodo(n1); g.pushNodo(n2); g.pushNodo(n3); g.pushNodo(n4); g.pushNodo(n5); g.pushNodo(n6);
+
     for (auto i : aristas) {
         g.pushArista(i);
     }
