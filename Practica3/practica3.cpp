@@ -18,6 +18,10 @@ struct nodo {
 
 
     nodo(int id) : id_nodo(id) {}
+
+    bool operator == (const nodo &n) const{
+        return id_nodo == n.id_nodo;
+    }
 };
 
 //typedef pair<nodo,nodo> arista;
@@ -26,6 +30,9 @@ struct arista {
     nodo second;
 
     arista (nodo n1, nodo n2) : first(n1), second (n2) {}
+    bool operator == (const arista &x) const{
+        return (first == x.first && second == x.second);
+    }
 };
 
 class Grafo {
@@ -179,7 +186,7 @@ list<arista> Greedy (const Grafo & g) {
     }
 
     nodo v = g.getNodos()[0];
-    while (solucion.size() != aristas.size()) {  //O(n^3)
+    while (solucion.size() != g.NumAristas()) {  //O(n^3)
         list<arista> aristasV = aristasUnidasaNodo(v, aristas);
 
         if (aristasV.size() == 1) {
