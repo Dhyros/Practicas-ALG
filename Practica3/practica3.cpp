@@ -177,7 +177,7 @@ bool grafoSigueConexo (const Grafo &g, arista &arist){ // O(n^2*a)
     return true;
 }
 
-list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
+list<arista> Greedy (const Grafo & g) {  
     list<arista> solucion;
     list<arista> aristas = g.getAristas();
 
@@ -187,12 +187,12 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
 
     nodo v = g.getNodo(0);
 
-    while (solucion.size() != g.NumAristas()) {  // O(n^2*a^2)
-        list<arista> aristasV = aristasUnidasaNodo(v, aristas); // O(a)
+    while (solucion.size() != g.NumAristas()) {  
+        list<arista> aristasV = aristasUnidasaNodo(v, aristas); 
 
         if (aristasV.size() == 1) {
 
-            aristas.remove(aristasV.front()); // O(n)
+            aristas.remove(aristasV.front()); 
 
             if (aristasV.front().first.id_nodo == v.id_nodo){
                 v = aristasV.front().second;
@@ -208,11 +208,11 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
 
         } else {
 
-            while (!grafoSigueConexo(g, aristasV.back())) { // O(n^2*a)
+            while (!grafoSigueConexo(g, aristasV.back())) { 
                 aristasV.pop_back();
             }
 
-            aristas.remove(aristasV.back()); // O(n)
+            aristas.remove(aristasV.back()); 
 
             if (aristasV.back().first.id_nodo == v.id_nodo){
                 v = aristasV.back().second;
