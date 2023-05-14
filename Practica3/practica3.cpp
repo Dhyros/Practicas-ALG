@@ -12,24 +12,9 @@ enum Color {BLANCO, GRIS, NEGRO};
 
 struct nodo {
     int id_nodo;
-    //vector<nodo> conexiones; // numero de aristas conectadas al nodo
     Color color; // Color del nodo
-    //nodo padre();
-    int distancia; // Distancia a raíz del arbol
-
 
     nodo(int id) : id_nodo(id) {}
-
-    string mostrarColor(){
-        if (color == BLANCO)
-            return "BLANCO";
-        else if (color == GRIS)
-            return "GRIS";
-        else if (color == NEGRO)
-            return "NEGRO";
-        else
-            return "NO COLOR";
-    }
 
     bool operator == (const nodo &n) const{
         return id_nodo == n.id_nodo;
@@ -62,15 +47,15 @@ public:
         return nodos[pos];
     }
 
-    void setNodo (const vector<nodo> &n){
-        nodos = n;
-    }
-
     int NumNodos() const {
         return nodos.size();
     }
 
     const list<arista> & getAristas() const {
+        return aristas;
+    }
+
+    list<arista> & getAristas() {
         return aristas;
     }
 
@@ -86,6 +71,10 @@ public:
         return nodos;
     }
 
+    void setNodos (const vector<nodo> &n){
+        nodos = n;
+    }
+
     int NumAristas() const {
         return aristas.size();
     }
@@ -98,7 +87,7 @@ public:
         aristas.push_back(a);
     }
 
-    bool nodoRelacionado (const nodo &n1, const nodo &n2){ //O(n)
+    bool nodoRelacionado (const nodo &n1, const nodo &n2){ // O(a)
         for (arista a : aristas){
             if (a.first.id_nodo == n1.id_nodo && a.second.id_nodo == n2.id_nodo)
                 return true;
@@ -108,64 +97,31 @@ public:
         return false;
     }
 
-    void removeArista (arista & a){
-        //aristas.erase(remove(aristas.begin(), aristas.end(), a), aristas.end());
-        /* list<arista> aux;
-        for (arista i : aristas){
-            if (i.first.id_nodo != a.first.id_nodo || i.second.id_nodo != a.second.id_nodo){
-                aux.push_back(i);
-            }
-        }
-        aristas = aux; */
-        aristas.remove(a);
-    }
-
-    /* vector<nodo> &Conexiones (nodo &n){
-        vector<nodo> aux;
-        for (nodo i : nodos){
-            for (nodo j : i.conexiones){
-                if (j.id_nodo == n.id_nodo){
-                    aux.push_back(i);
-                }
-            }
-        }
-
-        return aux;
-    } */
-
-    void BFS (int i){ //O(n^3)
+    void BFS (int i){ //O(n^2*a)
         nodo &s = nodos[i];
-        int num = nodos.size() +1;
 
         for (nodo &n : nodos){ //O(n)
             n.color = BLANCO;
-            n.distancia = num;
         }
 
         s.color = GRIS;
-        s.distancia = 0;
 
         list<nodo*> cola;
         cola.push_back(&s);
-        while (!cola.empty()){ //O(n^3)
+        while (!cola.empty()){ //O(n^2*a)
             nodo &u = (*cola.front());
             cola.pop_front();
 
-            for (nodo &v : nodos){  //O(n^2)
-                if (nodoRelacionado(v, u)) //O(n)
+            for (nodo &v : nodos){  //O(n*a)
+                if (nodoRelacionado(v, u)) //O(a)
                     if (v.color == BLANCO){
                         v.color = GRIS;
-                        v.distancia = u.distancia +1;
                         cola.push_back(&v);
                     }
             }
 
             u.color = NEGRO;
-            //cout << u.mostrarColor() << endl;
         }
-
-        //s.color = NEGRO;
-
     }
 
     /* friend istream &operator>>(istream & in, Grafo & g) {
@@ -194,7 +150,7 @@ public:
     } */
 };
 
-list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(n)
+list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(a)
     list<arista> solucion;
 
     for (arista i : aristas) {
@@ -206,13 +162,13 @@ list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(n)
     return solucion;
 }
 
-bool grafoSigueConexo (const Grafo &g, arista &arist){ // O(n^3)
+bool grafoSigueConexo (const Grafo &g, arista &arist){ // O(n^2*a)
     Grafo aux;
-    aux.setNodo(g.getNodos());
+    aux.setNodos(g.getNodos());
     aux.setAristas(g.getAristas());
 
-    aux.removeArista(arist); // O(n)
-    aux.BFS(0); // O(n^3)
+    aux.getAristas().remove(arist); // O(n)
+    aux.BFS(0); // O(n^2*a)
 
     for (nodo &n : aux.getNodos()){ // O(n)
         if (n.color != NEGRO) return false;
@@ -221,7 +177,7 @@ bool grafoSigueConexo (const Grafo &g, arista &arist){ // O(n^3)
     return true;
 }
 
-list<arista> Greedy (const Grafo & g) {  //O(n^4)
+list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
     list<arista> solucion;
     list<arista> aristas = g.getAristas();
 
@@ -231,24 +187,24 @@ list<arista> Greedy (const Grafo & g) {  //O(n^4)
 
     nodo v = g.getNodo(0);
 
-    while (solucion.size() != g.NumAristas()) {  //O(n^4)
-        list<arista> aristasV = aristasUnidasaNodo(v, aristas);
+    while (solucion.size() != g.NumAristas()) {  // O(n^2*a^2)
+        list<arista> aristasV = aristasUnidasaNodo(v, aristas); // O(a)
 
         if (aristasV.size() == 1) {
             solucion.push_back(aristasV.front());
-            aristas.remove(aristasV.front());
+            aristas.remove(aristasV.front()); // O(n)
 
             if (aristasV.front().first.id_nodo == v.id_nodo) v = aristasV.front().second;
             else  v = aristasV.front().first;
 
         } else {
 
-            while (!grafoSigueConexo(g, aristasV.back())) { // O(n^3)
+            while (!grafoSigueConexo(g, aristasV.back())) { // O(n^2*a)
                 aristasV.pop_back();
             }
 
             solucion.push_back(aristasV.back());
-            aristas.remove(aristasV.back());
+            aristas.remove(aristasV.back()); // O(n)
 
             if (aristasV.back().first.id_nodo == v.id_nodo) v = aristasV.back().second;
             else  v = aristasV.back().first;
