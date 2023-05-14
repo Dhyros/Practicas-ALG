@@ -21,7 +21,6 @@ struct nodo {
     }
 };
 
-//typedef pair<nodo,nodo> arista;
 struct arista {
     nodo first;
     nodo second;
@@ -34,17 +33,21 @@ struct arista {
 
 class Grafo {
 private:
-    vector<nodo> nodos;
+    list<nodo> nodos;
     list<arista> aristas;
 
 public:
 
     const nodo & getNodo(int pos) const{
-        return nodos[pos];
+        auto it = nodos.begin();
+        advance(it, pos);
+        return *it;
     }
 
     nodo & getNodo(int pos) {
-        return nodos[pos];
+        auto it = nodos.begin();
+        advance(it, pos);
+        return *it;
     }
 
     int NumNodos() const {
@@ -63,15 +66,15 @@ public:
         aristas = a;
     }
 
-    const vector<nodo> & getNodos() const {
+    const list<nodo> & getNodos() const {
         return nodos;
     }
 
-    vector<nodo> & getNodos()  {
+    list<nodo> & getNodos()  {
         return nodos;
     }
 
-    void setNodos (const vector<nodo> &n){
+    void setNodos (const list<nodo> &n){
         nodos = n;
     }
 
@@ -98,7 +101,7 @@ public:
     }
 
     void BFS (int i){ //O(n^2*a)
-        nodo &s = nodos[i];
+        nodo &s = getNodo(i);
 
         for (nodo &n : nodos){ //O(n)
             n.color = BLANCO;
@@ -196,9 +199,9 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
             }
             else {
                 v = aristasV.front().first;
-                nodo aux = aristasV.front().first.id_nodo;
+                nodo tmp = aristasV.front().first.id_nodo;
                 aristasV.front().first = aristasV.front().second;
-                aristasV.front().second = aux;
+                aristasV.front().second = tmp;
             }
 
             solucion.push_back(aristasV.front());
@@ -259,107 +262,4 @@ int main(int argc, char ** argv) {
     }
 
     return 0;
-
-    /*****************************************************************************************************************/
-
-    /**
-     * GRAFO 1
-    */
-
-    /* Grafo g;
-    list<arista> aristas;
-
-    nodo n1(1);
-    nodo n2(2);
-    nodo n3(3);
-    nodo n4(4);
-    nodo n5(5);
-    nodo n6(6);
-    nodo n7(7);
-    nodo n8(8);
-    nodo n9(9);
-    nodo n10(10);
-
-    arista a1 = arista(n1, n2), a2 = arista(n1, n7), a3 = arista(n1, n6), a4 = arista(n1, n5);
-    aristas.push_back(a1); aristas.push_back(a2); aristas.push_back(a3); aristas.push_back(a4);
-
-    arista a5 = arista(n2, n7), a6 = arista(n2, n8), a7 = arista(n2, n3);
-    aristas.push_back(a5); aristas.push_back(a6); aristas.push_back(a7);
-
-    arista a8 = arista(n3, n8), a9 = arista(n3, n9), a10 = arista(n3, n4);
-    aristas.push_back(a8); aristas.push_back(a9); aristas.push_back(a10);
-
-    arista a11 = arista(n4, n9), a12 = arista(n4, n10), a13 = arista(n4, n5);
-    aristas.push_back(a11); aristas.push_back(a12); aristas.push_back(a13);
-
-    arista a14 = arista(n5, n10), a15 = arista(n5, n6);
-    aristas.push_back(a14); aristas.push_back(a15);
-
-    arista a16 = arista(n6, n10), a17 = arista(n6, n7);
-    aristas.push_back(a16); aristas.push_back(a17);
-
-    arista a18 = arista(n7, n8);
-    aristas.push_back(a18);
-
-    arista a19 = arista(n8, n9);
-    aristas.push_back(a19);
-
-    arista a20 = arista(n9, n10);
-    aristas.push_back(a20);
-
-    g.pushNodo(n1); g.pushNodo(n2); g.pushNodo(n3); g.pushNodo(n4); g.pushNodo(n5);
-    g.pushNodo(n6); g.pushNodo(n7); g.pushNodo(n8); g.pushNodo(n9); g.pushNodo(n10);
-
-    for (auto i : aristas) {
-        g.pushArista(i);
-    }
-
-    list<arista> solucion = Greedy(g);
-
-    for (auto i : solucion) {
-        cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
-    } */
-
-    /*****************************************************************************************************************/
-
-    /**
-     * GRAFO 2
-    */
-
-    /* Grafo g;
-    list<arista> aristas;
-
-    nodo n1(1);
-    nodo n2(2);
-    nodo n3(3);
-    nodo n4(4);
-    nodo n5(5);
-    nodo n6(6);
-
-    arista a1 = arista(n1, n2), a2 = arista(n1, n6), a3 = arista(n1, n4), a4 = arista(n1, n5);
-    aristas.push_back(a1); aristas.push_back(a2); aristas.push_back(a3); aristas.push_back(a4);
-
-    arista a5 = arista(n2, n6), a6 = arista(n2, n3), a7 = arista(n2, n5);
-    aristas.push_back(a5); aristas.push_back(a6); aristas.push_back(a7);
-
-    arista a8 = arista(n3, n4);
-    aristas.push_back(a8);
-
-    arista a9 = arista(n4, n5), a10 = arista(n4, n6);
-    aristas.push_back(a9); aristas.push_back(a10);
-
-    arista a11 = arista(n5, n6);
-    aristas.push_back(a11);
-
-    g.pushNodo(n1); g.pushNodo(n2); g.pushNodo(n3); g.pushNodo(n4); g.pushNodo(n5); g.pushNodo(n6);
-
-    for (auto i : aristas) {
-        g.pushArista(i);
-    }
-
-    list<arista> solucion = Greedy(g);
-
-    for (auto i : solucion) {
-        cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
-    } */
 }
