@@ -124,30 +124,27 @@ public:
         }
     }
 
-    /* friend istream &operator>>(istream & in, Grafo & g) {
-        int n, valor;
+    friend istream &operator>>(istream & in, Grafo & g) {
 
-        in >> n;
+        int n_nodos, n_aristas;
 
-        for (int i=0; i<n; ++i) {
-            g.pushNodo(nodo(i));
+        in >> n_nodos >> n_aristas;
+
+        for (int n=1; n <= n_nodos; ++n){
+            nodo nodo_temp(n);
+            g.pushNodo(nodo_temp);
         }
 
-        for (int i=0; i<n; ++i) {
-            for (int j=0; j<n; ++j) {
-                in >> valor;
-                if (valor == 1) {
-                    if (find(g.getAristas().begin(), g.getAristas().end(), {g.getNodo(i), g.getNodo(j)}) == g.getAristas().end()) {
-                        g.pushArista({g.getNodo(i), g.getNodo(j)});
-                        g.getNodo(i).conexiones.push_back(&g.getNodo(j));
-                        g.getNodo(j).conexiones.push_back(&g.getNodo(i));
-                    }
-                }
-            }
+        for (int a=0; a < n_aristas; ++a){
+            int primero, segundo;
+            in >> primero >> segundo;
+            arista arista_temp (g.getNodo(primero-1), g.getNodo(segundo-1));
+            g.pushArista(arista_temp);
         }
 
         return in;
-    } */
+
+    }
 };
 
 list<arista> aristasUnidasaNodo (nodo &n, list<arista> &aristas) { //O(a)
@@ -191,11 +188,20 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
         list<arista> aristasV = aristasUnidasaNodo(v, aristas); // O(a)
 
         if (aristasV.size() == 1) {
-            solucion.push_back(aristasV.front());
+
             aristas.remove(aristasV.front()); // O(n)
 
-            if (aristasV.front().first.id_nodo == v.id_nodo) v = aristasV.front().second;
-            else  v = aristasV.front().first;
+            if (aristasV.front().first.id_nodo == v.id_nodo){
+                v = aristasV.front().second;
+            }
+            else {
+                v = aristasV.front().first;
+                nodo aux = aristasV.front().first.id_nodo;
+                aristasV.front().first = aristasV.front().second;
+                aristasV.front().second = aux;
+            }
+
+            solucion.push_back(aristasV.front());
 
         } else {
 
@@ -203,11 +209,19 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
                 aristasV.pop_back();
             }
 
-            solucion.push_back(aristasV.back());
             aristas.remove(aristasV.back()); // O(n)
 
-            if (aristasV.back().first.id_nodo == v.id_nodo) v = aristasV.back().second;
-            else  v = aristasV.back().first;
+            if (aristasV.back().first.id_nodo == v.id_nodo){
+                v = aristasV.back().second;
+            }
+            else {
+                v = aristasV.back().first;
+                nodo aux = aristasV.back().first.id_nodo;
+                aristasV.back().first = aristasV.back().second;
+                aristasV.back().second = aux;
+            }
+
+            solucion.push_back(aristasV.back());
         }
     }
 
@@ -215,7 +229,7 @@ list<arista> Greedy (const Grafo & g) {  // O(n^2*a^2)
 }
 
 
-int main() {
+int main(int argc, char ** argv) {
 
     /*
         Se va a suponer que los datos del grafo de entrada son siempre correctos. Es decir, que
@@ -224,7 +238,12 @@ int main() {
         El objetivo es encontrar un camino de Euler que recorra todas las aristas del grafo una sola vez.
     */
 
-    /* ifstream fi("grafo.txt");
+    if (argc != 2) {
+        cout << "Dime el nombre del fichero con el grafo" << endl;
+        return 0;
+    }
+
+    ifstream fi(argv[1]);
     if (!fi) {
         cout << "No puedo abrir el fichero." << endl;
         return 1;
@@ -233,14 +252,19 @@ int main() {
     Grafo g;
     fi >> g;
 
-    for (int i=0; i<g.NumNodos(); ++i) {
-        cout << "Conexiones nodo " << i << ": ";
-        for (auto j : g.getNodo(i).conexiones) {
+    list<arista> solucion = Greedy(g);
 
-        }
+    for (auto i : solucion) {
+        cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
     }
 
-    return 0; */
+    return 0;
+
+    /*****************************************************************************************************************/
+
+    /**
+     * GRAFO 1
+    */
 
     /* Grafo g;
     list<arista> aristas;
@@ -296,7 +320,13 @@ int main() {
         cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
     } */
 
-    Grafo g;
+    /*****************************************************************************************************************/
+
+    /**
+     * GRAFO 2
+    */
+
+    /* Grafo g;
     list<arista> aristas;
 
     nodo n1(1);
@@ -331,5 +361,5 @@ int main() {
 
     for (auto i : solucion) {
         cout << i.first.id_nodo << " " << i.second.id_nodo << endl;
-    }
+    } */
 }
