@@ -11,6 +11,10 @@ struct Empresa {
     int comision;
 };
 
+int Beneficio(const Empresa & empresa) {
+    return empresa.beneficio_accion * empresa.precio_accion;
+}
+
 int main(int argc, char** argv) {
 
     ifstream fi("empresas.txt");
@@ -20,7 +24,10 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    int N;
+    int N, X;
+    cout << "Introduce la cantidad de Euros a gastar: ";
+    cin >> X;
+
     fi >> N;
 
     vector<Empresa> empresas(N);
@@ -29,23 +36,6 @@ int main(int argc, char** argv) {
         fi >> empresas[i].num_acciones >> empresas[i].precio_accion 
            >> empresas[i].beneficio_accion >> empresas[i].comision;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
