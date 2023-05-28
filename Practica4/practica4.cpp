@@ -22,13 +22,13 @@ void resolver(int X, const vector<Empresa>& empresas) {
     // Ordenar las empresas por la razón beneficio / precio en orden descendente
     vector<pair<double, int>> orden;
     for (int i = 0; i < N; i++) {
-        //double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion;
+        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion;
         //double razon = empresas[i].precio_accion;
-        double razon = empresas[i].beneficio;
+        //double razon = empresas[i].beneficio;
         orden.push_back({razon, i});
     }
-    //sort(orden.rbegin(), orden.rend());
-    sort(orden.begin(), orden.end());
+    sort(orden.rbegin(), orden.rend());
+    //sort(orden.begin(), orden.end());
 
     // Imprimir el orden
     cout << endl << "Orden de las empresas: " << endl;
@@ -48,8 +48,9 @@ void resolver(int X, const vector<Empresa>& empresas) {
     for (int j = 0; j <= X; j++) {
         int empresa = orden[0].second;
         int acc_compradas = min(empresas[empresa].acciones_disponibles, static_cast<int>(j / empresas[empresa].precio_accion));
+        int dinero_gastado = acc_compradas * empresas[empresa].precio_accion;
         PD[0][j] = empresas[empresa].beneficio * acc_compradas * empresas[empresa].precio_accion -
-                   empresas[empresa].comision /* * j */ * acc_compradas;
+                   empresas[empresa].comision * dinero_gastado;
     }
 
     // Calcular el beneficio máximo
@@ -57,8 +58,9 @@ void resolver(int X, const vector<Empresa>& empresas) {
         int empresa = orden[i].second;
         for (int j = 1; j <= X; j++) {
             int acc_compradas = min(empresas[empresa].acciones_disponibles, static_cast<int>(j / empresas[empresa].precio_accion));
+            int dinero_gastado = acc_compradas * empresas[empresa].precio_accion;
             int beneficio_con_compra = empresas[empresa].beneficio * acc_compradas * empresas[empresa].precio_accion
-                                     - empresas[empresa].comision /* * j */ * acc_compradas;
+                                     - empresas[empresa].comision * dinero_gastado;
             beneficio_con_compra += PD[i-1][j - acc_compradas * empresas[empresa].precio_accion];
             PD[i][j] = max(PD[i-1][j], beneficio_con_compra);
         }
@@ -103,8 +105,8 @@ double calcularBeneficioMaximo(int X, vector<Empresa>& empresas, vector<int>& ac
     if (X >= (accionesCompradas[i] * empresas[i].precio_accion /* + empresas[i].comision */)) {
         accionesCompradas[i]++;
         beneficioComprar = (accionesCompradas[i] * empresas[i].precio_accion * empresas[i].beneficio) -
-        empresas[i].comision*X*accionesCompradas[i] + calcularBeneficioMaximo(X - (accionesCompradas[i] * empresas[i].precio_accion +
-        empresas[i].comision*X*accionesCompradas[i]), empresas, accionesCompradas, i);
+        empresas[i].comision*accionesCompradas[i]*empresas[i].precio_accion + calcularBeneficioMaximo(X -
+        (accionesCompradas[i] * empresas[i].precio_accion), empresas, accionesCompradas, i);
         accionesCompradas[i]--;
     }
 
