@@ -46,12 +46,12 @@ void resolver(int X, const vector<Empresa>& empresas) {
     }
     for (int j = 0; j <= X; j++) {
         int empresa = orden[0].second;
-        if (j >= empresas[empresa].precio_accion + empresas[empresa].comision){
-            PD[0][j] = empresas[empresa].beneficio * empresas[empresa].precio_accion + 
-                        PD[0][j - empresas[empresa].precio_accion - empresas[empresa].comision];
+        int n = j/static_cast<int>(empresas[empresa].precio_accion + empresas[empresa].comision);
+        if (n > empresas[empresa].acciones_disponibles){
+            PD[0][j] = empresas[empresa].acciones_disponibles*empresas[empresa].beneficio * empresas[empresa].precio_accion;
         }
         else {
-            PD[0][j] = 0;
+            PD[0][j] = n*empresas[empresa].beneficio * empresas[empresa].precio_accion;
         }
     }
 
@@ -60,21 +60,29 @@ void resolver(int X, const vector<Empresa>& empresas) {
         int empresa = orden[i].second;
         for (int j = 1; j <= X; j++) {
             int beneficio=0;
-            if (j >= empresas[empresa].precio_accion + empresas[empresa].comision){  
-                if ((j-empresas[empresa].acciones_disponibles*empresas[empresa].comision)/empresas[empresa].precio_accion < 
-                    empresas[empresa].acciones_disponibles) { 
+            if (j >= empresas[empresa].precio_accion + empresas[empresa].comision){
+
+                if (PD[i][j-empresas[empresa].precio_accion - empresas[empresa].comision] ==
+                    PD[i-1][j-empresas[empresa].precio_accion - empresas[empresa].comision]){
+
                     beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
                     beneficio += PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
                 }
-                else {
-                    beneficio = PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
+                else{
+                    int acc = 0;
+                    while (PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
+                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]){
+                        acc++;
+                    }
+                    if (acc < empresas[empresa].acciones_disponibles){
+                        beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
+                        beneficio += PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
+                    }
                 }
-                PD[i][j] = max(PD[i-1][j], beneficio);
             }
-            else {
-                beneficio = PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
-                PD[i][j] = max(PD[i-1][j], beneficio);
-            }
+
+            PD[i][j] = max(PD[i-1][j], beneficio);
+
         }
     }
 
@@ -89,13 +97,11 @@ void resolver(int X, const vector<Empresa>& empresas) {
             acciones_compradas[empresa]++;
             j = (j - empresas[empresa].precio_accion - empresas[empresa].comision);
         }
-        else if (k == 0 && PD[k][j] != 0 && PD[k][j] != PD[k][j-empresas[empresa].precio_accion-empresas[empresa].comision]) {
+        else if (k == 0 && PD[k][j] != PD[k][j-empresas[empresa].precio_accion - empresas[empresa].comision] ) {
             acciones_compradas[empresa]++;
             j = (j - empresas[empresa].precio_accion - empresas[empresa].comision);
         }
-        else if(k == 0 && PD[k][j] != 0)
-            acciones_compradas[empresa]++;
-        else 
+        else
             k--;
     }
 
