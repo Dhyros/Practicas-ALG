@@ -71,9 +71,7 @@ void resolver(int X, const vector<Empresa>& empresas) {
                 else{
                     int acc = 0;
                     while ((PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
-                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]) /* &&
-                           (PD[i][j - (acc)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
-                           PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]) */){
+                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)])){
                         acc++;
                     }
                     if (acc < empresas[empresa].acciones_disponibles){
