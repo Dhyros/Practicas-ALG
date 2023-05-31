@@ -70,13 +70,18 @@ void resolver(int X, const vector<Empresa>& empresas) {
                 }
                 else{
                     int acc = 0;
-                    while (PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
-                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]){
+                    while ((PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
+                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]) /* &&
+                           (PD[i][j - (acc)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
+                           PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)]) */){
                         acc++;
                     }
                     if (acc < empresas[empresa].acciones_disponibles){
                         beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
                         beneficio += PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
+                    }
+                    else {
+                        beneficio = PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
                     }
                 }
             }
@@ -93,8 +98,12 @@ void resolver(int X, const vector<Empresa>& empresas) {
 
     while (k>=0) {
         int empresa = orden[k].second;
-        if (k > 0 && PD[k][j] != PD[k-1][j] ){
+        if (k > 0 && PD[k][j] != PD[k-1][j] &&
+                            PD[k][j] != PD[k][j-empresas[empresa].precio_accion - empresas[empresa].comision]){
             acciones_compradas[empresa]++;
+            j = (j - empresas[empresa].precio_accion - empresas[empresa].comision);
+        }
+        else if (k > 0 && PD[k][j] != PD[k-1][j]){
             j = (j - empresas[empresa].precio_accion - empresas[empresa].comision);
         }
         else if (k == 0 && PD[k][j] != PD[k][j-empresas[empresa].precio_accion - empresas[empresa].comision] ) {
