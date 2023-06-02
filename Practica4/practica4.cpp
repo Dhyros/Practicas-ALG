@@ -38,7 +38,7 @@ void resolver(int X, const vector<Empresa>& empresas) {
     cout << endl;
 
     // Inicializar la matriz de programación dinámica
-    vector<vector<int>> PD(N , vector<int>(X + 1, 0));
+    vector<vector<double>> PD(N , vector<double>(X + 1, 0));
 
     // Rellenar casos base
     for (int i = 0; i < N; i++) {
@@ -59,10 +59,13 @@ void resolver(int X, const vector<Empresa>& empresas) {
     for (int i = 1; i < N; i++) {
         int empresa = orden[i].second;
         for (int j = 1; j <= X; j++) {
-            int beneficio=0;
+            double beneficio=0;
             if (j >= empresas[empresa].precio_accion + empresas[empresa].comision){
 
-                if (PD[i][j-empresas[empresa].precio_accion - empresas[empresa].comision] ==
+                if (j == empresas[empresa].precio_accion + empresas[empresa].comision){
+                    beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
+                }
+                else if (PD[i][j-empresas[empresa].precio_accion - empresas[empresa].comision] ==
                     PD[i-1][j-empresas[empresa].precio_accion - empresas[empresa].comision]){
 
                     beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
@@ -82,12 +85,18 @@ void resolver(int X, const vector<Empresa>& empresas) {
                         beneficio = PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
                     }
                 }
+
             }
 
             PD[i][j] = max(PD[i-1][j], beneficio);
 
         }
     }
+
+    cout << PD[N-1][X] << endl;
+    cout << PD[N-1][X - 19*empresas[4].precio_accion-19*empresas[4].comision] << endl;
+    cout << PD[N-1][X - 20*empresas[4].precio_accion-20*empresas[4].comision] << endl;
+    cout << PD[N-2][X - 20*empresas[4].precio_accion-20*empresas[4].comision] << endl;
 
     // Obtener las acciones compradas
     int j = X;
@@ -120,27 +129,95 @@ void resolver(int X, const vector<Empresa>& empresas) {
 }
 
 // Función recursiva para calcular el beneficio máximo
-double calcularBeneficioMaximo(int X, vector<Empresa>& empresas, vector<int>& accionesCompradas, int i) {
-    // Caso base: si ya hemos recorrido todas las empresas o no tenemos dinero para invertir
-    if (i >= empresas.size() || X <= 0) {
-        return 0;
+void PDAuxiliar(int X, const vector<Empresa>& empresas) {
+    int N = empresas.size();
+
+    // Ordenar las empresas por la razón beneficio / precio en orden descendente
+    vector<pair<double, int>> orden;
+    for (int i = 0; i < N; i++) {
+        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion;
+        //double razon = empresas[i].precio_accion;
+        //double razon = empresas[i].beneficio;
+        orden.push_back({razon, i});
+    }
+    //sort(orden.rbegin(), orden.rend());
+    sort(orden.begin(), orden.end());
+
+    // Imprimir el orden
+    cout << endl << "Orden de las empresas: " << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "Empresa " << orden[i].second+1 << ": " << orden[i].first << endl;
     }
 
-    // Caso 1: No comprar acciones de la empresa actual
-    double beneficioNoComprar = calcularBeneficioMaximo(X, empresas, accionesCompradas, i + 1);
+    cout << endl;
 
-    // Caso 2: Comprar acciones de la empresa actual si hay suficientes fondos
-    double beneficioComprar = 0;
-    if (X >= (accionesCompradas[i] * empresas[i].precio_accion /* + empresas[i].comision */)) {
-        accionesCompradas[i]++;
-        beneficioComprar = (accionesCompradas[i] * empresas[i].precio_accion * empresas[i].beneficio) -
-        empresas[i].comision*accionesCompradas[i]*empresas[i].precio_accion + calcularBeneficioMaximo(X -
-        (accionesCompradas[i] * empresas[i].precio_accion), empresas, accionesCompradas, i);
-        accionesCompradas[i]--;
+    // Inicializar la matriz de programación dinámica
+    vector<vector<double>> PD(N , vector<double>(X + 1, 0));
+    vector<vector<int>> accionesCompradas(N , vector<int>(X + 1, 0));
+
+    // Rellenar casos base
+    for (int i = 0; i < N; i++) {
+        PD[i][0] = 0;
+    }
+    for (int j = 0; j <= X; j++) {
+        int empresa = orden[0].second;
+        PD[0][j] = 0;
+        for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
+            double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+            if (j >= coste){
+                double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
+                if (PD[0][j] < beneficio){
+                    PD[0][j] = beneficio;
+                    accionesCompradas[empresa][j] = k;
+                }
+            }
+        }
     }
 
-    // Devolver el máximo beneficio entre los dos casos
-    return max(beneficioNoComprar, beneficioComprar);
+
+    // Calcular el beneficio máximo
+    for (int i=1 ; i<N; i++){
+        int empresa = orden[i].second;
+
+        for (int j=1; j<=X; j++){
+            PD[i][j] = PD[i-1][j];
+
+            for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
+
+                double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+
+                if (j >= coste){
+
+                    double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
+
+                    if (PD[i][j] < PD[i-1][j-coste] + beneficio){
+                        PD[i][j] = PD[i-1][j-coste] + beneficio;
+                        accionesCompradas[empresa][j] = k;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    // Obtener las acciones compradas
+    vector<int> acciones_compradas(N, 0);
+    int dinero = X;
+    for (int i=N-1; i>=0; i--){
+        int empresa = orden[i].second;
+        acciones_compradas[empresa] = accionesCompradas[empresa][dinero];
+        dinero -= acciones_compradas[empresa]*empresas[empresa].precio_accion + acciones_compradas[empresa]*empresas[empresa].comision;
+    }
+
+    // Imprimir el resultado
+    cout << endl << "Beneficio máximo: " << PD[N-1][X] << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "Acciones compradas en la empresa " << i+1 << ": " << acciones_compradas[i] << endl;
+    }
+
 }
 
 int main(int argc, char** argv) {
@@ -179,16 +256,7 @@ int main(int argc, char** argv) {
     }
 
     resolver(X, empresas);
-    vector<int> accionesCompradas(N, 0);
-    cout << endl << "Beneficio máximo: " << calcularBeneficioMaximo(X, empresas, accionesCompradas, 0) << endl;
-
-    // Imprimir las acciones compradas para cada empresa
-    cout << "Acciones compradas:" << endl;
-    for (int i = 0; i < N; i++) {
-        if (accionesCompradas[i] > 0) {
-            cout << "Empresa " << i + 1 << ": " << accionesCompradas[i] << " acciones" << endl;
-        }
-    }
+    PDAuxiliar(X, empresas);
 
     return 0;
 }
