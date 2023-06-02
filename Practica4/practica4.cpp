@@ -128,7 +128,7 @@ void resolver(int X, const vector<Empresa>& empresas) {
     }
 }
 
-// Función recursiva para calcular el beneficio máximo
+// Función auxiliar para resolver el problema utilizando programación dinámica
 void PDAuxiliar(int X, const vector<Empresa>& empresas) {
     int N = empresas.size();
 
@@ -163,9 +163,12 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {
         int empresa = orden[0].second;
         PD[0][j] = 0;
         for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
+
             double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+
             if (j >= coste){
                 double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
+
                 if (PD[0][j] < beneficio){
                     PD[0][j] = beneficio;
                     accionesCompradas[empresa][j] = k;
@@ -174,33 +177,27 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {
         }
     }
 
-
     // Calcular el beneficio máximo
     for (int i=1 ; i<N; i++){
         int empresa = orden[i].second;
-
         for (int j=1; j<=X; j++){
-            PD[i][j] = PD[i-1][j];
 
+            PD[i][j] = PD[i-1][j];
             for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
 
                 double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
 
                 if (j >= coste){
-
                     double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
+                    beneficio += PD[i-1][j-coste];
 
-                    if (PD[i][j] < PD[i-1][j-coste] + beneficio){
-                        PD[i][j] = PD[i-1][j-coste] + beneficio;
+                    if (PD[i][j] < beneficio){
+                        PD[i][j] = beneficio;
                         accionesCompradas[empresa][j] = k;
                     }
-
                 }
-
             }
-
         }
-
     }
 
     // Obtener las acciones compradas
@@ -220,6 +217,7 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {
 
 }
 
+// Función principal
 int main(int argc, char** argv) {
 
     ifstream fi("empresas.txt");
