@@ -15,38 +15,43 @@ struct Empresa {
     double comision;
 };
 
-double calculaCoste(const vector<Empresa>& empresas, const vector<int>& sol) {
+double calculaCoste(const vector<Empresa>& empresas, const vector<int>& combination) {
     double sum = 0.0;
     for (int i=0; i<empresas.size(); i++) {
-        sum += empresas[i].precio_accion * sol[i] + empresas[i].comision;
+        sum += empresas[i].precio_accion * combination[i] + empresas[i].comision;
     }
 
     return sum;
 }
 
-double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& sol) {
+double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& combination) {
     double sum = 0.0;
     for (int i=0; i<empresas.size(); i++) {
-        sum += empresas[i].precio_accion * empresas[i].beneficio;
+        sum += empresas[i].precio_accion * empresas[i].beneficio * combination[i];
     }
-    
+
     return sum;
 }
 
 // Función parar resolver el problema utilizando fuerza bruta
 void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vector<int>& sol, vector<int>& combination, double& maxBeneficio) {
-    if (index == empresas.size()-1) {
-        double sum = calculaBeneficio(empresas, sol);
-        if (calculaCoste(empresas, combination) < X && sum > maxBeneficio) {
+    if (index == empresas.size()) {
+        double sum = calculaBeneficio(empresas, combination);
+        // cout << "Combinación";
+        // for (int i : combination) {
+        //     cout << " " << i;
+        // }
+        // cout << " = " << sum << endl;
+        if (calculaCoste(empresas, combination) <= X && sum > maxBeneficio) {
             maxBeneficio = sum;
             sol = combination;
         }
     }
     else {
         // Recorrer todas las combinaciones posibles
-        for (int i=0; i<empresas[index].acciones_disponibles; i++) {
+        for (int i=0; i<=empresas[index].acciones_disponibles; i++) {
             // Insertar posible solución
-            sol.push_back(i);
+            combination.push_back(i);
 
             resolverFuerzaBruta(X, empresas, index+1, sol, combination, maxBeneficio);
 
@@ -307,11 +312,22 @@ int main(int argc, char** argv) {
     for (int i=0; i<N; ++i) {
         cout << "Empresa " << i+1 << ": " << empresas[i].acciones_disponibles << " acciones disponibles, "
              << empresas[i].precio_accion << " euros por acción, " << empresas[i].beneficio*100 << " % de beneficio, "
-             << empresas[i].comision << " euros de comisión por cada acción." << endl;
+             << empresas[i].comision << " euro(s) de comisión por cada acción." << endl;
     }
 
-    resolver(X, empresas);
+    // resolver(X, empresas);
     PDAuxiliar(X, empresas);
+
+    vector<int> v = resolverFB(X, empresas);
+
+    cout << endl << "-----------------------------------------" << endl;
+    cout << "FUERZA BRUTA" << endl;
+    cout << "Beneficio máximo: " << calculaBeneficio(empresas, v) << endl;
+    cout << "Acciones a comprar:" << endl;
+    for (int i=0; i<empresas.size(); i++) {
+        cout << "    Empresa " << i+1 << ": " << v[i] << endl;
+    }
+
 
     return 0;
 }
