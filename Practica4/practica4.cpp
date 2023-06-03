@@ -182,20 +182,24 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {
         int empresa = orden[i].second;
         for (int j=1; j<=X; j++){
 
-            PD[i][j] = PD[i-1][j];
             for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
 
                 double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+                double beneficio = 0;
 
                 if (j >= coste){
-                    double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
+                    beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
                     beneficio += PD[i-1][j-coste];
-
-                    if (PD[i][j] < beneficio){
-                        PD[i][j] = beneficio;
-                        accionesCompradas[empresa][j] = k;
-                    }
                 }
+
+                if (k==1){
+                    PD[i][j] = max(PD[i-1][j], beneficio);
+                } else{
+                    PD[i][j] = max(PD[i][j], beneficio);
+                }
+
+                if (PD[i][j] == beneficio && beneficio != 0)
+                    accionesCompradas[empresa][j] = k;
             }
         }
     }
