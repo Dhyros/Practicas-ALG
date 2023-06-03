@@ -37,11 +37,6 @@ double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& comb
 void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vector<int>& sol, vector<int>& combination, double& maxBeneficio) {
     if (index == empresas.size()) {
         double sum = calculaBeneficio(empresas, combination);
-        // cout << "Combinación";
-        // for (int i : combination) {
-        //     cout << " " << i;
-        // }
-        // cout << " = " << sum << endl;
         if (calculaCoste(empresas, combination) <= X && sum > maxBeneficio) {
             maxBeneficio = sum;
             sol = combination;
