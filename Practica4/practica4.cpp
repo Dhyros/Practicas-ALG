@@ -37,7 +37,7 @@ double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& sol)
 void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vector<int>& sol, vector<int>& combination, double& maxBeneficio) {
     if (index == empresas.size()-1) {
         double sum = calculaBeneficio(empresas, sol);
-        if (sum < X && sum > maxBeneficio) {
+        if (calculaCoste(empresas, combination) < X && sum > maxBeneficio) {
             maxBeneficio = sum;
             sol = combination;
         }
