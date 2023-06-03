@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <climits>
 
 using namespace std;
 
@@ -13,6 +14,44 @@ struct Empresa {
     double beneficio;
     double comision;
 };
+
+double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& sol) {
+    return 0.0;
+}
+
+// Función parar resolver el problema utilizando fuerza bruta
+void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vector<int>& sol, vector<int>& combination, double& maxBeneficio) {
+    if (index == empresas.size()-1) {
+        double sum = calculaBeneficio(empresas, sol);
+        if (sum < X && sum > maxBeneficio) {
+            maxBeneficio = sum;
+            sol = combination;
+        }
+    }
+    else {
+        // Recorrer todas las combinaciones posibles
+        for (int i=0; i<empresas[index].acciones_disponibles; i++) {
+            // Insertar posible solución
+            sol.push_back(i);
+
+            resolverFuerzaBruta(X, empresas, index+1, sol, combination, maxBeneficio);
+
+            // Eliminar el último elemento del vector para seguir probando combinaciones
+            combination.pop_back();
+        }
+    }
+}
+
+// Función encargada de pasar los argumentos necesarios para la primera ejecución
+// del algoritmo de fuerza bruta
+vector<int> resolverFB(int& X, vector<Empresa>& empresas) {
+    vector<int> sol, combination;
+    double maxBeneficio = INT_MIN;
+
+    resolverFuerzaBruta(X, empresas, 0, sol, combination, maxBeneficio);
+
+    return sol;
+}
 
 // Función para resolver el problema utilizando programación dinámica
 void resolver(int X, const vector<Empresa>& empresas) {
