@@ -15,6 +15,15 @@ struct Empresa {
     double comision;
 };
 
+double calculaCoste(const vector<Empresa>& empresas, const vector<int>& sol) {
+    double sum = 0.0;
+    for (int i=0; i<empresas.size(); i++) {
+        sum += empresas[i].precio_accion * sol[i] + empresas[i].comision;
+    }
+
+    return sum;
+}
+
 double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& sol) {
     return 0.0;
 }
