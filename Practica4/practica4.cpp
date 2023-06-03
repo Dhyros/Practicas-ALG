@@ -18,7 +18,7 @@ struct Empresa {
 double calculaCoste(const vector<Empresa>& empresas, const vector<int>& combination) {
     double sum = 0.0;
     for (int i=0; i<empresas.size(); i++) {
-        sum += empresas[i].precio_accion * combination[i] + empresas[i].comision;
+        sum += (empresas[i].precio_accion + empresas[i].comision) * combination[i];
     }
 
     return sum;
