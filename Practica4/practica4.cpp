@@ -25,7 +25,12 @@ double calculaCoste(const vector<Empresa>& empresas, const vector<int>& sol) {
 }
 
 double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& sol) {
-    return 0.0;
+    double sum = 0.0;
+    for (int i=0; i<empresas.size(); i++) {
+        sum += empresas[i].precio_accion * empresas[i].beneficio;
+    }
+    
+    return sum;
 }
 
 // Función parar resolver el problema utilizando fuerza bruta
