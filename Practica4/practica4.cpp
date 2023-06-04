@@ -35,7 +35,8 @@ double calculaBeneficio(const vector<Empresa>& empresas, const vector<int>& comb
 
 // Función parar resolver el problema utilizando fuerza bruta
 void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vector<int>& sol, vector<int>& combination,
-                         double& maxBeneficio) {  // T(e) = a * T(e-1) + O(1)
+                         double& maxBeneficio) {  // O(a^e)
+
     if (index == empresas.size()) { // O(e) e = empresas.size()
         double sum = calculaBeneficio(empresas, combination);
         if (calculaCoste(empresas, combination) <= X && sum > maxBeneficio) {
@@ -45,7 +46,7 @@ void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vect
     }
     else {
         // Recorrer todas las combinaciones posibles
-        for (int i=0; i<=empresas[index].acciones_disponibles; i++) { // T(e) = a * T(e-1) + O(1)
+        for (int i=0; i<=empresas[index].acciones_disponibles; i++) { // T(e) = a * (T(e-1) + 1) -----> O(a^e)
             // Insertar posible solución
             combination.push_back(i); // O(1)
 
@@ -55,15 +56,16 @@ void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vect
             combination.pop_back(); // O(1)
         }
     }
+
 }
 
 // Función encargada de pasar los argumentos necesarios para la primera ejecución
 // del algoritmo de fuerza bruta
-vector<int> resolverFB(int& X, vector<Empresa>& empresas) {
-    vector<int> sol, combination;
-    double maxBeneficio = INT_MIN;
+vector<int> resolverFB(int& X, vector<Empresa>& empresas) { // O(a^e)
+    vector<int> sol, combination; // O(1)
+    double maxBeneficio = INT_MIN; // O(1)
 
-    resolverFuerzaBruta(X, empresas, 0, sol, combination, maxBeneficio);
+    resolverFuerzaBruta(X, empresas, 0, sol, combination, maxBeneficio); // O(a^e)
 
     return sol;
 }
@@ -73,23 +75,22 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     int N = empresas.size();
 
     // Ordenar las empresas por la razón beneficio / precio en orden descendente
-    vector<pair<double, int>> orden;
-    for (int i = 0; i < N; i++) { // O(e) e = empresas.size()
-        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion;
-        //double razon = empresas[i].precio_accion;
-        //double razon = empresas[i].beneficio;
-        orden.push_back({razon, i});
+    vector<pair<double, int>> orden; // O(1)
+    for (int i = 0; i < N; i++) { // O(e) ----> e = empresas.size()
+
+        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion; // O(1)
+        orden.push_back({razon, i}); // O(1)
+    
     }
-    //sort(orden.rbegin(), orden.rend());
+
     sort(orden.begin(), orden.end()); // O(e*log(e))
 
     // Imprimir el orden
-    cout << endl << "Orden de las empresas: " << endl;
-    for (int i = 0; i < N; i++) {
-        cout << "Empresa " << orden[i].second+1 << ": " << orden[i].first << endl;
+    cout << endl << "Orden de las empresas: " << endl; // O(1)
+    for (int i = 0; i < N; i++) { // O(e)
+        cout << "Empresa " << orden[i].second+1 << ": " << orden[i].first << endl; // O(1)
     }
-
-    cout << endl;
+    cout << endl; // O(1)
 
     // Inicializar la matriz de programación dinámica
     vector<vector<double>> PD(N , vector<double>(X + 1, 0));
@@ -98,6 +99,7 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     for (int i = 0; i < N; i++) { // O(e) e = empresas.size()
         PD[i][0] = 0;
     }
+
     for (int j = 0; j <= X; j++) { // O(X * a)
         int empresa = orden[0].second;
         PD[0][j] = 0;
@@ -113,20 +115,20 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
         int empresa = orden[i].second;
         for (int j=1; j<=X; j++){ // O(X * a)
 
-            for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){ // O(a)
+            for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){ // O(a) -----> a = numero de acciones de la empresa
 
-                double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
-                double beneficio = 0;
+                double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision); // O(1)
+                double beneficio = 0; // O(1)
 
-                if (j >= coste){
-                    beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
-                    beneficio += PD[i-1][j-coste];
+                if (j >= coste){ // O(1)
+                    beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio; // O(1)
+                    beneficio += PD[i-1][j-coste]; // O(1)
                 }
 
-                if (k==1)
-                    PD[i][j] = max(PD[i-1][j], beneficio);
+                if (k==1) // O(1)
+                    PD[i][j] = max(PD[i-1][j], beneficio); // O(1)
                 else
-                    PD[i][j] = max(PD[i][j], beneficio);
+                    PD[i][j] = max(PD[i][j], beneficio); // O(1)
 
             }
         }
@@ -141,23 +143,28 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
 
         if ( i>0 && PD[i][dinero] != PD[i-1][dinero] ){
 
-            for (int k = 1; k <= empresas[empresa].acciones_disponibles; k++){
+            bool parar = false;
+
+            for (int k = 1; k <= empresas[empresa].acciones_disponibles && !parar; k++){ // O(a)
                 if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio +
-                        PD[i-1][dinero-k*(empresas[empresa].precio_accion + empresas[empresa].comision)]){
+                        PD[i-1][dinero-k*(empresas[empresa].precio_accion + empresas[empresa].comision)]){ // O(1)
                     acciones_compradas[empresa] = k;
                     dinero -= k*(empresas[empresa].precio_accion + empresas[empresa].comision);
                     i--;
-                    break;
+                    parar = true;
                 }
            }
+
         }
         else if (i==0 && PD[i][dinero] != 0){
 
-            for (int k = 1; k <= empresas[empresa].acciones_disponibles; k++){
-                if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio){
+            bool parar = false;
+
+            for (int k = 1; k <= empresas[empresa].acciones_disponibles && !parar; k++){ // O(a)
+                if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio){ // O(1)
                     acciones_compradas[empresa] = k;
                     dinero -= k*(empresas[empresa].precio_accion + empresas[empresa].comision);
-                    break;
+                    parar = true;
                 }
             }
         }
