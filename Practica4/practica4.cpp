@@ -138,12 +138,13 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     vector<int> acciones_compradas(N, 0);
     int dinero = X;
     int i = N-1;
+
     while (i>=0){
+
         int empresa = orden[i].second;
+        bool parar = false;
 
         if ( i>0 && PD[i][dinero] != PD[i-1][dinero] ){
-
-            bool parar = false;
 
             for (int k = 1; k <= empresas[empresa].acciones_disponibles && !parar; k++){ // O(a)
                 if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio +
@@ -158,8 +159,6 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
         }
         else if (i==0 && PD[i][dinero] != 0){
 
-            bool parar = false;
-
             for (int k = 1; k <= empresas[empresa].acciones_disponibles && !parar; k++){ // O(a)
                 if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio){ // O(1)
                     acciones_compradas[empresa] = k;
@@ -167,6 +166,7 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
                     parar = true;
                 }
             }
+            
         }
         else
             i--;
