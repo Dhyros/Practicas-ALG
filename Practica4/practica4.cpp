@@ -170,7 +170,12 @@ vector<int> resolverPD(int X, const vector<Empresa>& empresas) {  // O(e * X * a
 // Función principal
 int main(int argc, char** argv) {
 
-    ifstream fi("empresas.txt");
+    if (argc != 2){
+        cerr << "Numero de argumentos incorrecto" << endl;
+        cerr << "./practica4 <archivo de empresas.txt>" << endl;
+    }
+
+    ifstream fi(argv[1]);
 
     if (!fi) {
         cerr << "No se pudo abrir el archivo de empresas." << endl;
