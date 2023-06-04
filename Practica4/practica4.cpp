@@ -56,7 +56,6 @@ void resolverFuerzaBruta(int X, const vector<Empresa>& empresas, int index, vect
             combination.pop_back(); // O(1)
         }
     }
-
 }
 
 // Función encargada de pasar los argumentos necesarios para la primera ejecución
@@ -71,7 +70,7 @@ vector<int> resolverFB(int& X, vector<Empresa>& empresas) { // O(a^e)
 }
 
 // Función auxiliar para resolver el problema utilizando programación dinámica
-void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
+vector<int> resolverPD(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     int N = empresas.size();
 
     // Ordenar las empresas por la razón beneficio / precio en orden descendente
@@ -80,17 +79,10 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
 
         double razon = (empresas[i].beneficio) / empresas[i].precio_accion; // O(1)
         orden.push_back({razon, i}); // O(1)
-    
+
     }
 
     sort(orden.begin(), orden.end()); // O(e*log(e))
-
-    // Imprimir el orden
-    cout << endl << "Orden de las empresas: " << endl; // O(1)
-    for (int i = 0; i < N; i++) { // O(e)
-        cout << "Empresa " << orden[i].second+1 << ": " << orden[i].first << endl; // O(1)
-    }
-    cout << endl; // O(1)
 
     // Inicializar la matriz de programación dinámica
     vector<vector<double>> PD(N , vector<double>(X + 1, 0));
@@ -172,12 +164,7 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
             i--;
     }
 
-    // Imprimir el resultado
-    cout << endl << "Beneficio máximo: " << PD[N-1][X] << endl;
-    for (int i = 0; i < N; i++) {
-        cout << "Acciones compradas en la empresa " << i+1 << ": " << acciones_compradas[i] << endl;
-    }
-
+    return acciones_compradas;
 }
 
 // Función principal
@@ -210,19 +197,36 @@ int main(int argc, char** argv) {
 
     fi.close();
 
+    /************************************************************************/
+    // Información de cada empresa
+
     for (int i=0; i<N; ++i) {
         cout << "Empresa " << i+1 << ": " << empresas[i].acciones_disponibles << " acciones disponibles, "
              << empresas[i].precio_accion << " euros por acción, " << empresas[i].beneficio*100 << " % de beneficio, "
              << empresas[i].comision << " euro(s) de comisión por cada acción." << endl;
     }
 
-    // resolver(X, empresas);
-    PDAuxiliar(X, empresas);
+    /************************************************************************/
+    // Algoritmos
 
-    vector<int> v = resolverFB(X, empresas);
+    vector<int> v;
+
+    // FuerzaBruta
+    v = resolverFB(X, empresas);
 
     cout << endl << "-----------------------------------------" << endl;
     cout << "FUERZA BRUTA" << endl;
+    cout << "Beneficio máximo: " << calculaBeneficio(empresas, v) << endl;
+    cout << "Acciones a comprar:" << endl;
+    for (int i=0; i<empresas.size(); i++) {
+        cout << "    Empresa " << i+1 << ": " << v[i] << endl;
+    }
+
+    // Programación dinámica
+    v = resolverPD(X, empresas);
+
+    cout << endl << "-----------------------------------------" << endl;
+    cout << "PROGRAMACIÓN DINÁMICA" << endl;
     cout << "Beneficio máximo: " << calculaBeneficio(empresas, v) << endl;
     cout << "Acciones a comprar:" << endl;
     for (int i=0; i<empresas.size(); i++) {
