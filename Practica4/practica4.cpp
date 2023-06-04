@@ -78,7 +78,7 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     vector<pair<double, int>> orden; // O(1)
     for (int i = 0; i < N; i++) { // O(e) ----> e = empresas.size()
 
-        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion; // O(1)
+        double razon = (empresas[i].beneficio) / empresas[i].precio_accion; // O(1)
         orden.push_back({razon, i}); // O(1)
     
     }
