@@ -68,148 +68,6 @@ vector<int> resolverFB(int& X, vector<Empresa>& empresas) {
     return sol;
 }
 
-// Función para resolver el problema utilizando programación dinámica
-void resolver(int X, const vector<Empresa>& empresas) {
-    int N = empresas.size();
-
-    // Ordenar las empresas por la razón beneficio / precio en orden descendente
-    vector<pair<double, int>> orden;
-    for (int i = 0; i < N; i++) {
-        double razon = static_cast<double>(empresas[i].beneficio) / empresas[i].precio_accion;
-        //double razon = empresas[i].precio_accion;
-        //double razon = empresas[i].beneficio;
-        orden.push_back({razon, i});
-    }
-    sort(orden.rbegin(), orden.rend());
-    //sort(orden.begin(), orden.end());
-
-    // Imprimir el orden
-    cout << endl << "Orden de las empresas: " << endl;
-    for (int i = 0; i < N; i++) {
-        cout << "Empresa " << orden[i].second+1 << ": " << orden[i].first << endl;
-    }
-
-    cout << endl;
-
-    // Inicializar la matriz de programación dinámica
-    vector<vector<double>> PD(N , vector<double>(X + 1, 0));
-    vector<vector<int>> accionesCompradas(N , vector<int>(X + 1, 0));
-
-    // Matriz adyacente para saber el número de acciones compradas
-
-    // Rellenar casos base
-    for (int i = 0; i < N; i++) {
-        PD[i][0] = 0;
-    }
-    for (int j = 0; j <= X; j++) {
-        /* int empresa = orden[0].second;
-        int n = j/static_cast<int>(empresas[empresa].precio_accion + empresas[empresa].comision);
-        if (n > empresas[empresa].acciones_disponibles){
-            PD[0][j] = empresas[empresa].acciones_disponibles*empresas[empresa].beneficio * empresas[empresa].precio_accion;
-        }
-        else {
-            PD[0][j] = n*empresas[empresa].beneficio * empresas[empresa].precio_accion;
-        } */
-
-        int empresa = orden[0].second;
-        PD[0][j] = 0;
-        for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){
-
-            double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
-
-            if (j >= coste){
-                double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
-
-                if (PD[0][j] < beneficio){
-                    PD[0][j] = beneficio;
-                    accionesCompradas[empresa][j] = k;
-                }
-            }
-        }
-    }
-
-    // Calcular el beneficio máximo
-    for (int i = 1; i < N; i++) {
-        int empresa = orden[i].second;
-        for (int j = 1; j <= X; j++) {
-            double beneficio=0;
-            if (j >= empresas[empresa].precio_accion + empresas[empresa].comision){
-
-                if (j == empresas[empresa].precio_accion + empresas[empresa].comision){
-                    beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
-                    //accionesCompradas[empresa][j]++;
-                }
-                /* else if (PD[i][j-empresas[empresa].precio_accion - empresas[empresa].comision] ==
-                    PD[i-1][j-empresas[empresa].precio_accion - empresas[empresa].comision]){
-
-                    beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
-                    beneficio += PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
-                }
-                else{
-                    int acc = 0;
-                    while ((PD[i][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)] !=
-                           PD[i-1][j - (acc+1)*(empresas[empresa].precio_accion + empresas[empresa].comision)])){
-                        acc++;
-                    }
-                    if (acc < empresas[empresa].acciones_disponibles){
-                        beneficio = empresas[empresa].beneficio * empresas[empresa].precio_accion;
-                        beneficio += PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
-                    }
-                    else {
-                        beneficio = PD[i][j - empresas[empresa].precio_accion - empresas[empresa].comision];
-                    }
-                } */
-                else if (accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)]
-                            <= empresas[empresa].acciones_disponibles){
-                    beneficio = empresas[empresa].precio_accion*empresas[empresa].beneficio;
-                    beneficio += PD[i-1][j - (empresas[empresa].precio_accion + empresas[empresa].comision)];
-                    /* accionesCompradas[empresa][j] =
-                        accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)] + 1; */
-                }
-                /* else {
-                    beneficio = PD[i-1][j-(empresas[empresa].precio_accion + empresas[empresa].comision)];
-                } */
-
-            }
-
-            PD[i][j] = max(PD[i-1][j], beneficio);
-
-            /* if (PD[i][j] == beneficio && beneficio != 0 && accionesCompradas[empresa][j-(empresas[empresa].precio_accion +
-                            empresas[empresa].comision)] < empresas[empresa].acciones_disponibles){
-                accionesCompradas[empresa][j] =
-                    accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)] + 1;
-            }
-            else if (PD[i][j] == beneficio && beneficio != 0 ){
-                accionesCompradas[empresa][j] =
-                    accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)];
-            } */
-
-            if (max(PD[i-1][j], beneficio) == beneficio)
-                accionesCompradas[empresa][j] =
-                    accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)] + 1;
-            else
-                accionesCompradas[empresa][j] =
-                    accionesCompradas[empresa][j-(empresas[empresa].precio_accion + empresas[empresa].comision)];
-
-        }
-    }
-
-    // Obtener las acciones compradas
-    vector<int> acciones_compradas(N, 0);
-    int dinero = X;
-    for (int i=N-1; i>=0; i--){
-        int empresa = orden[i].second;
-        acciones_compradas[empresa] = accionesCompradas[empresa][dinero];
-        dinero -= acciones_compradas[empresa]*empresas[empresa].precio_accion + acciones_compradas[empresa]*empresas[empresa].comision;
-    }
-
-    // Imprimir el resultado
-    cout << endl << "Beneficio máximo: " << PD[N-1][X] << endl;
-    for (int i = 0; i < N; i++) {
-        cout << "Acciones compradas en la empresa " << i+1 << ": " << acciones_compradas[i] << endl;
-    }
-}
-
 // Función auxiliar para resolver el problema utilizando programación dinámica
 void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     int N = empresas.size();
@@ -235,7 +93,6 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
 
     // Inicializar la matriz de programación dinámica
     vector<vector<double>> PD(N , vector<double>(X + 1, 0));
-    vector<vector<int>> accionesCompradas(N , vector<int>(X + 1, 0));
 
     // Rellenar casos base
     for (int i = 0; i < N; i++) { // O(e) e = empresas.size()
@@ -244,19 +101,11 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     for (int j = 0; j <= X; j++) { // O(X * a)
         int empresa = orden[0].second;
         PD[0][j] = 0;
-        for (int k=1; k<=empresas[empresa].acciones_disponibles; k++){ // O(a)
-
-            double coste = k*(empresas[empresa].precio_accion + empresas[empresa].comision);
-
-            if (j >= coste){
-                double beneficio = k*empresas[empresa].precio_accion*empresas[empresa].beneficio;
-
-                if (PD[0][j] < beneficio){
-                    PD[0][j] = beneficio;
-                    accionesCompradas[empresa][j] = k;
-                }
-            }
-        }
+        int num_acciones = j / (empresas[empresa].precio_accion + empresas[empresa].comision);
+        if (num_acciones <= empresas[empresa].acciones_disponibles)
+            PD[0][j] = num_acciones * empresas[empresa].precio_accion * empresas[empresa].beneficio;
+        else
+            PD[0][j] = empresas[empresa].acciones_disponibles * empresas[empresa].precio_accion * empresas[empresa].beneficio;
     }
 
     // Calcular el beneficio máximo
@@ -274,14 +123,11 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
                     beneficio += PD[i-1][j-coste];
                 }
 
-                if (k==1){
+                if (k==1)
                     PD[i][j] = max(PD[i-1][j], beneficio);
-                } else {
+                else
                     PD[i][j] = max(PD[i][j], beneficio);
-                }
 
-                if (PD[i][j] == beneficio && beneficio != 0)
-                    accionesCompradas[empresa][j] = k;
             }
         }
     }
@@ -289,10 +135,34 @@ void PDAuxiliar(int X, const vector<Empresa>& empresas) {  // O(e * X * a)
     // Obtener las acciones compradas
     vector<int> acciones_compradas(N, 0);
     int dinero = X;
-    for (int i=N-1; i>=0; i--){ // O(e)
+    int i = N-1;
+    while (i>=0){
         int empresa = orden[i].second;
-        acciones_compradas[empresa] = accionesCompradas[empresa][dinero];
-        dinero -= acciones_compradas[empresa]*empresas[empresa].precio_accion + acciones_compradas[empresa]*empresas[empresa].comision;
+
+        if ( i>0 && PD[i][dinero] != PD[i-1][dinero] ){
+
+            for (int k = 1; k <= empresas[empresa].acciones_disponibles; k++){
+                if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio +
+                        PD[i-1][dinero-k*(empresas[empresa].precio_accion + empresas[empresa].comision)]){
+                    acciones_compradas[empresa] = k;
+                    dinero -= k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+                    i--;
+                    break;
+                }
+           }
+        }
+        else if (i==0 && PD[i][dinero] != 0){
+
+            for (int k = 1; k <= empresas[empresa].acciones_disponibles; k++){
+                if (PD[i][dinero] == k*empresas[empresa].precio_accion*empresas[empresa].beneficio){
+                    acciones_compradas[empresa] = k;
+                    dinero -= k*(empresas[empresa].precio_accion + empresas[empresa].comision);
+                    break;
+                }
+            }
+        }
+        else
+            i--;
     }
 
     // Imprimir el resultado
